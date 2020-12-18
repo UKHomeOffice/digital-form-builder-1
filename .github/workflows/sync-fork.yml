@@ -32,7 +32,20 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git pull
-        git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
+        git_log=`git ls-remote git url  master`
+        git_commitId = git_log | cut -d " " -f1
+        echo $git_commitId
+
+        #cd /workspace
+        git_log_verify = `git rev-parse HEAD`
+        echo $git_log_verify
+
+        if $git_commitId =$git_log_verify then
+        cd /workspace
+          git_authorName=`git log --pretty=format:"%an"`;
+          echo $git_authorName
+        fi
+        #git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
         #git push -u -f
         
 #     - name: Pull upstream changes
