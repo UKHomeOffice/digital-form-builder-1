@@ -29,12 +29,15 @@ jobs:
         ref: master
 
     - run: |
+        pwd
+        git pull
+        git status
+        echo "XXXXXXXXXXXXXX"
+        #
+        #git push -u -f
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git pull
         git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
-        #git push -u -f
-        
 #     - name: Pull upstream changes
 #       id: sync
 #       uses: aormsby/Fork-Sync-With-Upstream-action@v2.1
@@ -46,11 +49,5 @@ jobs:
 #         git_pull_args: --rebase
 
 
-#     # Step 3: Display a message if 'sync' step had new commits (simple test)
-#     - name: Check for new commits
-#       if: steps.sync.outputs.has_new_commits
-#       run: echo "There were new commits."
-
-#     # Step 4: Print a helpful timestamp for your records (not required)
-#     - name: Timestamp
-#       run: date
+    
+    
