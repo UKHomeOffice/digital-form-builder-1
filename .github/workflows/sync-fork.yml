@@ -35,8 +35,8 @@ jobs:
         echo "XXXXXXXXXXXXXX"
         #
         #git push -u -f
-        git config user.name $git_authorName
-        git config user.email $git_authorEmail
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
 #     - name: Pull upstream changes
 #       id: sync
