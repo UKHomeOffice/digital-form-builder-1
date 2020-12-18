@@ -29,27 +29,17 @@ jobs:
         ref: master
 
     - run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
         pwd
         git pull
         git status
         echo "XXXXXXXXXXXXXX"
-        git_log=`git ls-remote git url  master`
-        git_commitId = git_log | cut -d " " -f1
-        echo $git_commitId
-
-        #cd /workspace
-        git_log_verify = `git rev-parse HEAD`
-        echo $git_log_verify
-
-        if $git_commitId =$git_log_verify then
-        cd /workspace
-          git_authorName=`git log --pretty=format:"%an"`;
-          echo $git_authorName
-        fi
+        git_authorName=`git log https://github.com/XGovFormBuilder/digital-form-builder master --pretty=format:"%an"`;
+        git_authorEmail=`git log https://github.com/XGovFormBuilder/digital-form-builder master --pretty=format:"%ae"`;
+        echo "author name $git_authorName"
         #git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
         #git push -u -f
+        git config user.name $git_authorName
+        git config user.email $git_authorEmail
         
 #     - name: Pull upstream changes
 #       id: sync
