@@ -29,10 +29,12 @@ jobs:
         ref: master
 
     - run: |
-        cd digital-form-builder-1
         git config user.name github-actions
         git config user.email github-actions@github.com
+        pwd
         git pull
+        git status
+        echo "XXXXXXXXXXXXXX"
         git_log=`git ls-remote git url  master`
         git_commitId = git_log | cut -d " " -f1
         echo $git_commitId
