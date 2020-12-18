@@ -1,0 +1,33 @@
+---
+kind: pipeline
+name: code-analysis
+type: kubernetes
+  
+  - name: dev-run-tests-with-coverage
+    pull: if-not-exists
+    image: node:12.18.4-buster
+    commands:
+      - cd digital-form-builder
+      - yarn
+      - yarn build:dependencies
+      - yarn test-cov
+    when:
+      branch:
+        - master
+      event:
+        - push
+  
+  - name: sonar_scan
+    pull: if-not-exists
+    image: quay.digital.homeoffice.gov.uk/ukhomeofficedigital/sonar-scanner-node:6a03c77c7e1bad005893cdcc9cd3d99479b79d5c
+    commands:
+      - cp sonar/sonar-project.properties digital-form-builder/
+      - cp sonar/designer-sonar-project.properties digital-form-builder/designer/sonar-project.properties
+      - cp sonar/model-sonar-project.properties digital-form-builder/model/sonar-project.properties
+      - cp sonar/runner-sonar-project.properties digital-form-builder/runner/sonar-project.properties
+      - sonar-scanner -Dsonar.projectVersion=${DRONE_BUILD_NUMBER} -Dsonar.projectBaseDir=digital-form-builder -Dsonar.projectKey=digital-form-builder
+    when:
+      branch:
+        - master
+      event:
+        - push
