@@ -37,6 +37,9 @@ steps:
 - name: dev-build-image-designer
   pull: if-not-exists
   image: docker:lastest
+  volumes:
+    - name: docker_sock
+      path: /var/run/docker.sock
   commands:
     - docker build .
     - echo "- echo "digital-form-builder-runner:$DESIGNER_TAG_VERSION"
@@ -64,6 +67,9 @@ steps:
 - name: dev-build-image-runner
   pull: if-not-exists
   image: docker:latest
+  volumes:
+    - name: docker_sock
+      path: /var/run/docker.sock
   commands:
     - docker build .
     - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
