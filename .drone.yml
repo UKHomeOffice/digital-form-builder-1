@@ -153,7 +153,15 @@ name: after
 
 steps:
   - name: notify
-    image: plugins/slack
+    image: docker:latest
+    commands:
+      - echo 'Docker'
+      - docker -v
+    when:
+     branch:
+      - master
+    event:
+      - push    
 depends_on:
   - backend
   - build-deploy-builder
