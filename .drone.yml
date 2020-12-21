@@ -167,7 +167,7 @@ steps:
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ." > build.sh
+      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/." > build.sh
       - cat build.sh
       - sh build.sh
     when:
@@ -205,7 +205,7 @@ steps:
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-designer:$RUNNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ." > build.sh
+      - echo "docker build -t digital-form-builder-runner:$RUNNER_TAG_VERSION -t digital-form-builder-runner:$DRONE_COMMIT_SHA -t digital-form-builder-runner:latest ./images/runner/." > build.sh
       - cat build.sh
       - sh build.sh
     when:
