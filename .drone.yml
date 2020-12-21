@@ -36,7 +36,7 @@ steps:
   pull: if-not-exists
   image: node:12.18.4-buster
   commands:
-    - PACKAGE_VERSION=$(grep '"version":' package.json -m1 | cut -d\" -f4)
+    - PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version);")
     - echo $PACKAGE_VERSION
   when:
     branch:
