@@ -159,18 +159,7 @@ name: designer-deploy
 type: kubernetes
 
 steps:
-#  - name: check-designer-version
-#    pull: if-not-exists
-#    image: node:12.18.4-buster
-#    commands:
-#      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-#      - echo $DESIGNER_TAG_VERSION
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
-  - name: dev-build-image-designer
+  - name: build-designer-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -178,7 +167,7 @@ steps:
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION ." > build.sh
+      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION ${DRONE_COMMIT_SHA} latest ." > build.sh
       - cat build.sh
       - sh build.sh
     when:
@@ -189,14 +178,18 @@ steps:
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  
   - name: anchore-submission-server
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     commands:
       - /run.sh server
-#    depends_on:
-#      - check-designer-version
+  - name: scan-designer-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: test:${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-designer-image
 depends_on:
   - code-analyze-check
 
@@ -206,18 +199,7 @@ name: runner-deploy
 type: kubernetes
 
 steps:
-  - name: check-runner-version
-    pull: if-not-exists
-    image: node:12.18.4-buster
-    commands:
-      - export RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
-      - echo $RUNNER_TAG_VERSION
-    when:
-      branch:
-        - master
-      event:
-        - push
-  - name: dev-build-image-runner
+  - name: build-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -226,7 +208,7 @@ steps:
       - echo "$${RUNNER_TAG_VERSION}"
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-designer:$RUNNER_TAG_VERSION ." > build.sh
+      - echo "docker build -t digital-form-builder-designer:$RUNNER_TAG_VERSION ${DRONE_COMMIT_SHA} latest ." > build.sh
       - cat build.sh
       - sh build.sh
     when:
@@ -234,13 +216,13 @@ steps:
         - master
       event:
         - push
-    depends_on:
-      - check-runner-version
-  - name: scan-image
+  - name: scan-runner-image
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
       IMAGE_NAME: test:${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-runner-image
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
