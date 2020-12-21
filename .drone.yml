@@ -175,6 +175,18 @@ steps:
         - master
       event:
         - push
+  - name: scan-designer-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-designer-image
+    when:
+      branch:
+        - master
+      event:
+        - push
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -183,11 +195,7 @@ services:
     pull: always
     commands:
       - /run.sh server
-  - name: scan-designer-image
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    environment:
-      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
+
 depends_on:
   - code-analyze-check
 
@@ -218,6 +226,13 @@ steps:
     pull: always
     environment:
       IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-runner-image
+    when:
+      branch:
+        - master
+      event:
+        - push
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
