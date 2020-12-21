@@ -1,18 +1,7 @@
-#kind: pipeline
-#type: docker
-#name: backend
-#
-#steps:
-#  - name: build
-#    image: golang
-#    commands:
-#      - go build
-#      - go test
-
-#---
 kind: pipeline
 name: code-check
 type: kubernetes
+
 steps:
 - name: dev-run-tests-with-coverage
   pull: if-not-exists
@@ -211,34 +200,34 @@ steps:
 depends_on:
   - code-check
 
----
-kind: pipeline
-name: runner
-type: docker
-
-steps:
-  - name: check-runner-version
-    pull: if-not-exists
-    image: node:12.18.4-buster
-    commands:
-      - export RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
-      - echo $RUNNER_TAG_VERSION
-  - name: dev-build-image-designer
-    pull: if-not-exists
-    image: docker:lastest
-    volumes:
-      - name: docker_sock
-        path: /var/run/docker.sock
-    commands:
-      - docker build .
-      - echo "- echo "digital-form-builder-runner:$RUNNER_TAG_VERSION
-      - docker -t digital-form-builder-runner:$RUNNER_TAG_VERSION
-    when:
-      branch:
-        - master
-      event:
-        - push
-    depends_on:
-      - check-runner-version
-depends_on:
-  - code-check
+#---
+#kind: pipeline
+#name: runner
+#type: docker
+#
+#steps:
+#  - name: check-runner-version
+#    pull: if-not-exists
+#    image: node:12.18.4-buster
+#    commands:
+#      - export RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
+#      - echo $RUNNER_TAG_VERSION
+#  - name: dev-build-image-designer
+#    pull: if-not-exists
+#    image: docker:lastest
+#    volumes:
+#      - name: docker_sock
+#        path: /var/run/docker.sock
+#    commands:
+#      - docker build .
+#      - echo "- echo "digital-form-builder-runner:$RUNNER_TAG_VERSION
+#      - docker -t digital-form-builder-runner:$RUNNER_TAG_VERSION
+#    when:
+#      branch:
+#        - master
+#      event:
+#        - push
+#    depends_on:
+#      - check-runner-version
+#depends_on:
+#  - code-check
