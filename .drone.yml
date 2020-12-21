@@ -197,5 +197,5 @@ steps:
         - push
     depends_on:
       - check-designer-version
-depends_on:
-  - code-check
+#depends_on:
+#  - code-check
