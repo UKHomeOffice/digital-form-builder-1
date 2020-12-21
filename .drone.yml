@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 name: code-analysis
-type: kubernetes
+type: exec
 
 steps:
   - name: dev-run-tests-with-coverage
@@ -31,6 +31,52 @@ steps:
 kind: pipeline
 name: build-deploy-builder
 
+steps:
+  - name: dev-build-image
+      image: plugins/ecr
+      settings:
+        access_key:
+          from_secret: AWS_ACCESS_KEY_ID
+        secret_key:
+          from_secret: AWS_SECRET_ACCESS_KEY
+        region: eu-west-2
+        repo: stp/fco-form-builder
+        registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+        tags:
+          - ${DRONE_COMMIT_SHA}
+          - latest
+
+  - name: dev-deploy
+      image: quay.io/ukhomeofficedigital/kd:v1.16.0
+      commands:
+        - apk update
+        - apk add curl
+        - source bin/env.sh
+        - bin/deploy.sh
+      environment:
+        DRONE_DEPLOY_TO: acp-notprod
+        IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder
+        KUBE_NAMESPACE: stp-dev
+        KUBE_TOKEN_ACP_NOTPROD:
+          from_secret: kube_token_acp_notprod
+        PREVIEW_MODE: true
+        GOV_UK_NOTIFY_DEFAULT_API_KEY:
+          from_secret: NOTIFY_API_KEY
+        GOV_UK_NOTIFY_DEFAULT_TEMPLATE_ID: 2d2a640b-db7f-4eb8-8b41-e5d75fc64b64
+  - name: dev-smoke-test
+      image: node:12.18.4-buster
+      environment:
+        MOZ_HEADLESS: 1
+        BASE_URL: https://form-builder.dev.stp-notprod.homeoffice.gov.uk
+        DEFAULT_TIMEOUT: 10000
+        DBUS_SESSION_BUS_ADDRESS: /dev/null
+        NARRATE: "true"
+      commands:
+        - echo "Integration test $DRONE_BUILD_STATUS for $DRONE_REPO/$DRONE_BUILD_NUMBER. Running cuke tests."
+        - wget https://github.com/mozilla/geckodriver/releases/download/v0.27.0/geckodriver-v0.27.0-linux64.tar.gz && tar -xvzf geckodriver* && chmod +x geckodriver && mv geckodriver /usr/local/bin
+        - apt-get update
+        - apt-get install -y firefox-esr
+        - echo "Will run smoke tests"
 ---
 kind: pipeline
 name: build-deploy-runner
