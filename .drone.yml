@@ -187,6 +187,9 @@ steps:
         - master
       event:
         - push
+  - name: deploy-designer
+    commands:
+      - echo "Deploying designer digital-form-builder-designer:$DESIGNER_TAG_VERSION"
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -195,7 +198,6 @@ services:
     pull: always
     commands:
       - /run.sh server
-
 depends_on:
   - code-analyze-check
 
@@ -233,10 +235,12 @@ steps:
         - master
       event:
         - push
+  - name: deploy-runner
+    commands:
+      - echo "Deploying runner digital-form-builder-runner:$RUNNER_TAG_VERSION"
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  
   - name: anchore-submission-server
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
