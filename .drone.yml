@@ -13,6 +13,11 @@ steps:
       - master
     event:
         - push
+trigger:
+  branch:
+    - master
+  event:
+    - push
 #- name: dev-run-tests-with-coverage
 #  pull: if-not-exists
 #  image: node:12.18.4-buster
@@ -182,7 +187,11 @@ steps:
       - check-designer-version
 depends_on:
   - code-check
-
+trigger:
+  branch:
+    - master
+  event:
+    - push
 ---
 kind: pipeline
 name: runner
@@ -239,3 +248,8 @@ steps:
 depends_on:
   - designer
   - runner
+trigger:
+  branch:
+    - master
+  event:
+    - push
