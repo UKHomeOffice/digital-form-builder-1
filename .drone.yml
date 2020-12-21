@@ -12,9 +12,9 @@ steps:
   image: node:12.18.4-buster
   commands:
     - node -v
-    - yarn
-    - yarn build:dependencies
-    - yarn test-cov
+#    - yarn
+#    - yarn build:dependencies
+#    - yarn test-cov
   when:
     branch:
       - master
@@ -172,11 +172,12 @@ steps:
         - push
   - name: dev-build-image-designer
     pull: if-not-exists
-    image: docker:latest
+    image: docker:dind
     volumes:
-      - name: docker_sock
-        path: /var/run/docker.sock
+    - name: dockersock
+      path: /var/run/
     commands:
+      - docker ps -a
       - docker build .
       - echo "- echo "digital-form-builder-runner:$DESIGNER_TAG_VERSION"
       - docker -t digital-form-builder-designer:$DESIGNER_TAG_VERSION
@@ -209,11 +210,12 @@ steps:
         - push
   - name: dev-build-image-runner
     pull: if-not-exists
-    image: docker:latest
+    image: docker:dind
     volumes:
-      - name: docker_sock
-        path: /var/run/docker.sock
+      - name: dockersock
+      path: /var/run/
     commands:
+      - docker ps -a
       - docker build .
       - echo "- echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
       - docker -t digital-form-builder-runner:$RUNNER_TAG_VERSION
