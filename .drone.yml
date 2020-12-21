@@ -28,15 +28,30 @@ steps:
       - push
   depends_on:
     - dev-run-tests-with-coverage
+- name: check-version-designer
+  pull: if-not-exists
+    image: node:12.18.4-buster
+    commands:
+      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
+      - echo $DESIGNER_TAG_VERSION
 - name: dev-build-image-designer
   pull: if-not-exists
+  image: docker:lastest
+  commands:
+      - docker build . -t digital-form-builder-designer:$DESIGNER_TAG_VERSION
+  when:
+    branch:
+      - master
+    event:
+      - push
+  depends_on:
+    - check-version-designer
+- name: check-runner-version
+pull: if-not-exists
   image: node:12.18.4-buster
   commands:
-    - PACKAGE_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-    - echo $PACKAGE_VERSION
-    - cd designer
-    - yarn build
-    - docker build . -t digital-form-builder-designer:$
+    - RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
+    - echo $RUNNER_TAG_VERSION
   when:
     branch:
       - master
@@ -46,20 +61,16 @@ steps:
     - sonar_scan
 - name: dev-build-image-runner
   pull: if-not-exists
-  image: node:12.18.4-buster
+  image: docker:latest
   commands:
-    - PACKAGE_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
-    - echo $PACKAGE_VERSION
-    - cd runner
-    - yarn build
-    - docker build . -t digital-form-builder-runner:$
+    - docker build . -t digital-form-builder-runner:$RUNNER_TAG_VERSION
   when:
     branch:
       - master
     event:
       - push
   depends_on:
-    - sonar_scan
+    - check-runner-version
 - name: dev-deploy-designer
   pull: if-not-exists
   image: node:12.18.4-buster
