@@ -121,17 +121,19 @@ steps:
     - dev-deploy-designer
     - dev-deploy-runner
 ---
+
 kind: pipeline
 type: docker
 name: docker-tagging
 
 steps:
   - name: tag runner
+  pull: if-not-exists
   commands:
     - docker build .
     - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
-trigger:
-  branch:
-    - master
-  event:
-    - push
+  when:
+    branch:
+      - master
+    event:
+      - push
