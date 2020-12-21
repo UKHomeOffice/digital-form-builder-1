@@ -176,10 +176,9 @@ steps:
     commands:
       # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - docker -v
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-runner:$DESIGNER_TAG_VERSION ." > build.sh
+      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION ." > build.sh
       - cat build.sh
       - sh build.sh
     when:
@@ -225,8 +224,11 @@ steps:
       # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - echo "$${RUNNER_TAG_VERSION}"
-      - docker build -t digital-form-builder-runner:$${RUNNER_TAG_VERSION} .
-      - echo "Tagged digital-form-builder-runner:$RUNNER_TAG_VERSION"
+      - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo "$${RUNNER_TAG_VERSION}"
+      - echo "docker build -t digital-form-builder-designer:$RUNNER_TAG_VERSION ." > build.sh
+      - cat build.sh
+      - sh build.sh
     when:
       branch:
         - master
@@ -234,6 +236,20 @@ steps:
         - push
     depends_on:
       - check-runner-version
+  - name: scan-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: test:${DRONE_COMMIT_SHA}
+services:
+  - name: docker
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  
+  - name: anchore-submission-server
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    commands:
+      - /run.sh server
 depends_on:
   - code-analyze-check
 
