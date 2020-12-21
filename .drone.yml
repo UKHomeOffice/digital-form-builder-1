@@ -3,30 +3,40 @@ name: code-check
 type: kubernetes
 
 steps:
-- name: dev-run-tests-with-coverage
+- name: node-check
   pull: if-not-exists
   image: node:12.18.4-buster
   commands:
-    - yarn
-    - yarn build:dependencies
-    - yarn test-cov
+    - node -v
   when:
     branch:
       - master
     event:
-      - push
-- name: sonar_scan
-  pull: if-not-exists
-  image: quay.digital.homeoffice.gov.uk/ukhomeofficedigital/sonar-scanner-node:6a03c77c7e1bad005893cdcc9cd3d99479b79d5c
-  commands:
-    - sonar-scanner -Dsonar.projectVersion=${DRONE_BUILD_NUMBER} -Dsonar.projectBaseDir=. -Dsonar.projectKey=digital-form-builder
-  when:
-    branch:
-      - master
-    event:
-      - push
-  depends_on:
-    - dev-run-tests-with-coverage
+        - push
+#- name: dev-run-tests-with-coverage
+#  pull: if-not-exists
+#  image: node:12.18.4-buster
+#  commands:
+#    - yarn
+#    - yarn build:dependencies
+#    - yarn test-cov
+#  when:
+#    branch:
+#      - master
+#    event:
+#      - push
+#- name: sonar_scan
+#  pull: if-not-exists
+#  image: quay.digital.homeoffice.gov.uk/ukhomeofficedigital/sonar-scanner-node:6a03c77c7e1bad005893cdcc9cd3d99479b79d5c
+#  commands:
+#    - sonar-scanner -Dsonar.projectVersion=${DRONE_BUILD_NUMBER} -Dsonar.projectBaseDir=. -Dsonar.projectKey=digital-form-builder
+#  when:
+#    branch:
+#      - master
+#    event:
+#      - push
+#  depends_on:
+#    - dev-run-tests-with-coverage
 #- name: check-designer-version
 #  pull: if-not-exists
 #  image: node:12.18.4-buster
@@ -199,3 +209,18 @@ steps:
       - check-runner-version
 depends_on:
   - code-check
+
+---
+kind: pipeline
+name: sanity
+type: docker
+
+steps:
+  - name: smoke-tests
+    pull: if-not-exists
+    image: node:12.18.4-buster
+    commands:
+      - echo 'Smoke Tests'
+depends_on:
+  - designer
+  - runner
