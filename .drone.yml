@@ -1,6 +1,6 @@
 kind: pipeline
 name: code-check
-type: kubernetes
+type: exec
 
 steps:
 - name: node-check
