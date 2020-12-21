@@ -159,17 +159,17 @@ name: designer-deploy
 type: kubernetes
 
 steps:
-  - name: check-designer-version
-    pull: if-not-exists
-    image: node:12.18.4-buster
-    commands:
-      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-      - echo $DESIGNER_TAG_VERSION
-    when:
-      branch:
-        - master
-      event:
-        - push
+#  - name: check-designer-version
+#    pull: if-not-exists
+#    image: node:12.18.4-buster
+#    commands:
+#      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
+#      - echo $DESIGNER_TAG_VERSION
+#    when:
+#      branch:
+#        - master
+#      event:
+#        - push
   - name: dev-build-image-designer
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -186,8 +186,8 @@ steps:
         - master
       event:
         - push
-    depends_on:
-      - check-designer-version
+#    depends_on:
+#      - check-designer-version
 depends_on:
   - code-analyze-check
 
