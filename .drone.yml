@@ -15,7 +15,7 @@ steps:
     branch:
       - master
     event:
-        - push
+      - push
 #- name: dev-run-tests-with-coverage
 #  pull: if-not-exists
 #  image: node:12.18.4-buster
