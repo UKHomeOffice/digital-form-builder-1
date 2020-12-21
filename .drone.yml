@@ -40,7 +40,7 @@ steps:
     secret_key:
       from_secret: AWS_SECRET_ACCESS_KEY
     region: eu-west-2
-    repo: stp/fco-form-builder-designer
+    repo: digital-form-builder-1
     registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
     tags:
       - ${DRONE_COMMIT_SHA}
