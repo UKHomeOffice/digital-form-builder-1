@@ -176,9 +176,7 @@ steps:
     commands:
       # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - node -v
-      - npm i -g json
-      - json version -a < ./designer/package.json
+      - export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1)
       - echo "$${DESIGNER_TAG_VERSION}"
       - docker build -t digital-form-builder-runner:$${DESIGNER_TAG_VERSION} .
       - echo "Tagged digital-form-builder-runner:$DESIGNER_TAG_VERSION"
