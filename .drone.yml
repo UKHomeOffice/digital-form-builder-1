@@ -1,7 +1,18 @@
 kind: pipeline
+type: docker
+name: backend
+
+steps:
+  - name: build
+    image: golang
+    commands:
+      - go build
+      - go test
+
+---
+kind: pipeline
 name: build-deploy-builder
 type: kubernetes
-
 steps:
 - name: dev-run-tests-with-coverage
   pull: if-not-exists
@@ -63,73 +74,62 @@ steps:
       - push
   depends_on:
     - sonar_scan
-- name: publish-ecr
-  pull: if-not-exists
-  image: plugins/ecr
-  settings:
-    group: publish
-    settings:
-      access_key:
-        from_secret: AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: AWS_SECRET_ACCESS_KEY
-      context: ./runner
-      dockerfile: ./runner/Dockerfile
-      region: eu-west-2
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      repo: digital-form-build/runner
-      tags:
-        - latest
-        - ${DRONE_COMMIT_SHA:0:7}
-        - ${RUNNER_TAG_VERSION}
-  depends_on:
-    - sonar_scan
-- name: dev-build-image-runner
-  pull: if-not-exists
-  image: docker:latest
-  commands:
-    - docker build .
-    - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
-  when:
-    branch:
-      - master
-    event:
-      - push
-  depends_on:
-    - check-runner-version
-- name: dev-deploy-designer
-  pull: if-not-exists
-  image: node:12.18.4-buster
-  commands:
-    - echo "deploy designer"
-  depends_on:
-    - dev-build-image-designer
-- name: dev-deploy-runner
-  pull: if-not-exists
-  image: node:12.18.4-buster
-  commands:
-    - echo "deploy runner"
-  depends_on:
-    - dev-build-image-runner
-- name: dev-smoke-tests
-  pull: if-not-exists
-  image: node:12.18.4-buster
-  commands:
-    - echo  "Smoke tests"
-  depends_on:
-    - dev-deploy-designer
-    - dev-deploy-runner
----
-kind: pipeline
-type: docker
-name: default
-
-steps:
-  - name: test
-      image: golang
-      commands:
-        - go build
-        - go test
+#- name: publish-ecr
+#  pull: if-not-exists
+#  image: plugins/ecr
+#  settings:
+#    group: publish
+#    settings:
+#      access_key:
+#        from_secret: AWS_ACCESS_KEY_ID
+#      secret_key:
+#        from_secret: AWS_SECRET_ACCESS_KEY
+#      context: ./runner
+#      dockerfile: ./runner/Dockerfile
+#      region: eu-west-2
+#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+#      repo: digital-form-build/runner
+#      tags:
+#        - latest
+#        - ${DRONE_COMMIT_SHA:0:7}
+#        - ${RUNNER_TAG_VERSION}
+#  depends_on:
+#    - sonar_scan
+#- name: dev-build-image-runner
+#  pull: if-not-exists
+#  image: docker:latest
+#  commands:
+#    - docker build .
+#    - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
+#  when:
+#    branch:
+#      - master
+#    event:
+#      - push
+#  depends_on:
+#    - check-runner-version
+#- name: dev-deploy-designer
+#  pull: if-not-exists
+#  image: node:12.18.4-buster
+#  commands:
+#    - echo "deploy designer"
+#  depends_on:
+#    - dev-build-image-designer
+#- name: dev-deploy-runner
+#  pull: if-not-exists
+#  image: node:12.18.4-buster
+#  commands:
+#    - echo "deploy runner"
+#  depends_on:
+#    - dev-build-image-runner
+#- name: dev-smoke-tests
+#  pull: if-not-exists
+#  image: node:12.18.4-buster
+#  commands:
+#    - echo  "Smoke tests"
+#  depends_on:
+#    - dev-deploy-designer
+#    - dev-deploy-runner
 #kind: pipeline
 #type: docker
 #name: docker-tagging
