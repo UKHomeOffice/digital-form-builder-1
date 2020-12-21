@@ -47,7 +47,7 @@ steps:
   depends_on:
     - check-designer-version
 - name: check-runner-version
-pull: if-not-exists
+  pull: if-not-exists
   image: node:12.18.4-buster
   commands:
     - RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
