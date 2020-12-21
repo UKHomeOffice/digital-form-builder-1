@@ -182,11 +182,6 @@ steps:
       IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
-    when:
-      branch:
-        - master
-      event:
-        - push
   - name: deploy-designer
     commands:
       - echo "Deploying designer digital-form-builder-designer:$DESIGNER_TAG_VERSION"
@@ -230,11 +225,6 @@ steps:
       IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-    when:
-      branch:
-        - master
-      event:
-        - push
   - name: deploy-runner
     commands:
       - echo "Deploying runner digital-form-builder-runner:$RUNNER_TAG_VERSION"
