@@ -33,18 +33,9 @@ type: kubernetes
 
 steps:
 - name: dev-build-image
-  image: plugins/ecr
-  settings:
-    access_key:
-      from_secret: AWS_ACCESS_KEY_ID
-    secret_key:
-      from_secret: AWS_SECRET_ACCESS_KEY
-    region: eu-west-2
-    repo: digital-form-builder-1
-    registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-    tags:
-      - ${DRONE_COMMIT_SHA}
-      - latest
+  commands:
+    - PACKAGE_VERSION=$(grep '"version":' package.json -m1 | cut -d\" -f4)
+    - echo $PACKAGE_VERSION
   when:
     branch:
       - master
