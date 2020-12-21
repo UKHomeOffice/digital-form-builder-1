@@ -30,10 +30,10 @@ steps:
     - dev-run-tests-with-coverage
 - name: check-version-designer
   pull: if-not-exists
-    image: node:12.18.4-buster
-    commands:
-      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-      - echo $DESIGNER_TAG_VERSION
+  image: node:12.18.4-buster
+  commands:
+    - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
+    - echo $DESIGNER_TAG_VERSION
 - name: dev-build-image-designer
   pull: if-not-exists
   image: docker:lastest
