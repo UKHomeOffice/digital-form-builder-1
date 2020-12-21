@@ -158,6 +158,11 @@ steps:
     commands:
       - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
       - echo $DESIGNER_TAG_VERSION
+    when:
+      branch:
+        - master
+      event:
+        - push
   - name: dev-build-image-designer
     pull: if-not-exists
     image: docker:latest
@@ -190,6 +195,11 @@ steps:
     commands:
       - export RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
       - echo $RUNNER_TAG_VERSION
+    when:
+      branch:
+        - master
+      event:
+        - push
   - name: dev-build-image-runner
     pull: if-not-exists
     image: docker:latest
@@ -221,6 +231,11 @@ steps:
     image: node:12.18.4-buster
     commands:
       - echo 'Smoke Tests'
+    when:
+      branch:
+        - master
+      event:
+        - push
 depends_on:
   - designer
   - runner
