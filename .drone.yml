@@ -166,7 +166,7 @@ steps:
     depends_on:
       - check-designer-version
 depends_on:
-  - build-deploy-builder
+  - code-check
 
 #---
 #kind: pipeline
