@@ -26,12 +26,16 @@ steps:
       - master
     event:
       - push
+  depends_on:
+    - dev-run-tests-with-coverage
 - name: dev-build-image-designer
   pull: if-not-exists
   image: node:12.18.4-buster
   commands:
     - PACKAGE_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
     - echo $PACKAGE_VERSION
+    - cd designer
+    - yarn build
   when:
     branch:
       - master
@@ -45,6 +49,8 @@ steps:
   commands:
     - PACKAGE_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
     - echo $PACKAGE_VERSION
+    - cd runner
+    - yarn build
   when:
     branch:
       - master
