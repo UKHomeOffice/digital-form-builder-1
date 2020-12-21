@@ -226,7 +226,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: digital-form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
   - name: deploy-runner
