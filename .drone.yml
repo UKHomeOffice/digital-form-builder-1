@@ -172,15 +172,12 @@ steps:
         - push
   - name: dev-build-image-designer
     pull: if-not-exists
-    image: docker:dind
-    volumes:
-      - name: dockersock
-    path: /var/run/
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - docker ps -a
-      - docker build .
-      - echo "- echo "digital-form-builder-runner:$DESIGNER_TAG_VERSION"
-      - docker -t digital-form-builder-designer:$DESIGNER_TAG_VERSION
+      # wait for docker service to be up before running docker build
+      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - docker build -t "digital-form-builder-runner:$DESIGNER_TAG_VERSION" .
+      - echo "Tagged digital-form-builder-runner:$DESIGNER_TAG_VERSION"
     when:
       branch:
         - master
@@ -210,15 +207,12 @@ steps:
         - push
   - name: dev-build-image-runner
     pull: if-not-exists
-    image: docker:dind
-    volumes:
-      - name: dockersock
-    path: /var/run/
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - docker ps -a
-      - docker build .
-      - echo "- echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
-      - docker -t digital-form-builder-runner:$RUNNER_TAG_VERSION
+      # wait for docker service to be up before running docker build
+      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - docker build -t  "digital-form-builder-runner:$RUNNER_TAG_VERSION" .
+      - echo "Tagged digital-form-builder-runner:$RUNNER_TAG_VERSION"
     when:
       branch:
         - master
