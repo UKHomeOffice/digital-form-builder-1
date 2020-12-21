@@ -1,6 +1,6 @@
 kind: pipeline
 name: code-analyze-check
-type: docker
+type: kubernetes
 
 trigger:
   branch: master
@@ -156,7 +156,7 @@ steps:
 ---
 kind: pipeline
 name: designer-deploy
-type: docker
+type: kubernetes
 
 steps:
   - name: check-designer-version
@@ -193,7 +193,7 @@ depends_on:
 ---
 kind: pipeline
 name: runner-deploy
-type: docker
+type: kubernetes
 
 steps:
   - name: check-runner-version
@@ -230,7 +230,7 @@ depends_on:
 ---
 kind: pipeline
 name: sanity-check
-type: docker
+type: kubernetes
 
 steps:
   - name: smoke-tests
