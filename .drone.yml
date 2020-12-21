@@ -177,7 +177,7 @@ steps:
       # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - echo $DESIGNER_TAG_VERSION
-      - docker build -t digital-form-builder-runner:$DESIGNER_TAG_VERSION .
+      - docker build -t digital-form-builder-runner:$${DESIGNER_TAG_VERSION} .
       - echo "Tagged digital-form-builder-runner:$DESIGNER_TAG_VERSION"
     when:
       branch:
@@ -213,7 +213,7 @@ steps:
       # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - echo $RUNNER_TAG_VERSION
-      - docker build -t  digital-form-builder-runner:$RUNNER_TAG_VERSION .
+      - docker build -t  digital-form-builder-runner:$${RUNNER_TAG_VERSION} .
       - echo "Tagged digital-form-builder-runner:$RUNNER_TAG_VERSION"
     when:
       branch:
