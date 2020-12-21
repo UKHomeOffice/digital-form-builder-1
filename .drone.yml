@@ -2,6 +2,10 @@ kind: pipeline
 name: code-check
 type: docker
 
+trigger:
+  branch: master
+  event:
+    - push
 steps:
 - name: build
   pull: if-not-exists
