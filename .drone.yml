@@ -3,23 +3,19 @@ name: code-check
 type: docker
 
 steps:
-- name: node-check
+- name: build
   pull: if-not-exists
   image: node:12.18.4-buster
   commands:
-      - yarn
-      - yarn build:dependencies
-      - yarn test-cov
+    - node -v
+    - yarn
+    - yarn build:dependencies
+    - yarn test-cov
   when:
     branch:
       - master
     event:
         - push
-trigger:
-  branch:
-    - master
-  event:
-    - push
 #- name: dev-run-tests-with-coverage
 #  pull: if-not-exists
 #  image: node:12.18.4-buster
@@ -189,11 +185,6 @@ steps:
       - check-designer-version
 depends_on:
   - code-check
-trigger:
-  branch:
-    - master
-  event:
-    - push
 ---
 kind: pipeline
 name: runner
@@ -250,8 +241,3 @@ steps:
 depends_on:
   - designer
   - runner
-trigger:
-  branch:
-    - master
-  event:
-    - push
