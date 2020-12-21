@@ -1,4 +1,4 @@
-FROM ghcr.io/xgovformbuilder/digital-form-builder-runner:$
+FROM ghcr.io/xgovformbuilder/digital-form-builder-runner:latest
 
 WORKDIR /usr/src/app
 
