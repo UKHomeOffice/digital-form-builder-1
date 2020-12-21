@@ -183,6 +183,7 @@ steps:
     depends_on:
       - build-designer-image
   - name: deploy-designer
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       - echo "Deploying designer digital-form-builder-designer:$DESIGNER_TAG_VERSION"
 services:
@@ -226,6 +227,7 @@ steps:
     depends_on:
       - build-runner-image
   - name: deploy-runner
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       - echo "Deploying runner digital-form-builder-runner:$RUNNER_TAG_VERSION"
 services:
