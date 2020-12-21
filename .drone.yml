@@ -1,6 +1,6 @@
 kind: pipeline
 name: code-check
-type: exec
+type: docker
 
 steps:
 - name: node-check
