@@ -150,7 +150,7 @@ steps:
       - echo $DESIGNER_TAG_VERSION
   - name: dev-build-image-designer
     pull: if-not-exists
-    image: docker:lastest
+    image: docker:latest
     volumes:
       - name: docker_sock
         path: /var/run/docker.sock
@@ -168,34 +168,34 @@ steps:
 depends_on:
   - code-check
 
-#---
-#kind: pipeline
-#name: designer
-#type: docker
-#
-#steps:
-#  - name: check-designer-version
-#    pull: if-not-exists
-#    image: node:12.18.4-buster
-#    commands:
-#      - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-#      - echo $DESIGNER_TAG_VERSION
-#  - name: dev-build-image-designer
-#    pull: if-not-exists
-#    image: docker:lastest
-#    volumes:
-#      - name: docker_sock
-#        path: /var/run/docker.sock
-#    commands:
-#      - docker build .
-#      - echo "- echo "digital-form-builder-designer:$DESIGNER_TAG_VERSION"
-#      - docker -t digital-form-builder-designer:$DESIGNER_TAG_VERSION
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
-#    depends_on:
-#      - check-designer-version
-#depends_on:
-#  - code-check
+---
+kind: pipeline
+name: runner
+type: docker
+
+steps:
+  - name: check-runner-version
+    pull: if-not-exists
+    image: node:12.18.4-buster
+    commands:
+      - export RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
+      - echo $RUNNER_TAG_VERSION
+  - name: dev-build-image-runner
+    pull: if-not-exists
+    image: docker:latest
+    volumes:
+      - name: docker_sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build .
+      - echo "- echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
+      - docker -t digital-form-builder-runner:$RUNNER_TAG_VERSION
+    when:
+      branch:
+        - master
+      event:
+        - push
+    depends_on:
+      - check-runner-version
+depends_on:
+  - code-check
