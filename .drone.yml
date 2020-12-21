@@ -29,6 +29,7 @@ steps:
 ---
 kind: pipeline
 name: build-deploy-builder
+type: kubernetes
 
 steps:
   - name: dev-build-image
@@ -92,3 +93,4 @@ steps:
 ---
 kind: pipeline
 name: build-deploy-runner
+type: kubernetes
