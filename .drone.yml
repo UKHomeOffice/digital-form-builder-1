@@ -187,7 +187,7 @@ services:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: test:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
 depends_on:
   - code-analyze-check
 
