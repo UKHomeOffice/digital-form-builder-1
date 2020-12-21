@@ -145,3 +145,15 @@ steps:
 #      - master
 #    event:
 #      - push
+
+
+---
+kind: pipeline
+name: after
+
+steps:
+  - name: notify
+    image: plugins/slack
+depends_on:
+  - backend
+  - build-deploy-builder
