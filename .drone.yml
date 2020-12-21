@@ -1,7 +1,7 @@
 ---
 kind: pipeline
-name: code-analysis
-type: exec
+name: build-deploy-builder
+type: kubernetes
 
 steps:
   - name: dev-run-tests-with-coverage
@@ -26,12 +26,6 @@ steps:
         - master
       event:
         - push
----
-kind: pipeline
-name: build-deploy-builder
-type: kubernetes
-
-steps:
 - name: dev-build-image-designer
   pull: if-not-exists
   image: node:12.18.4-buster
