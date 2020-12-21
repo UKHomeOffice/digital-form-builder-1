@@ -32,17 +32,54 @@ name: build-deploy-builder
 type: kubernetes
 
 steps:
-- name: dev-build-image
+- name: dev-build-image-designer
   pull: if-not-exists
   image: node:12.18.4-buster
   commands:
-    - PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version);")
+    - PACKAGE_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
     - echo $PACKAGE_VERSION
   when:
     branch:
       - master
     event:
       - push
+  depends_on:
+    - sonar_scan
+- name: dev-build-image-runner
+  pull: if-not-exists
+  image: node:12.18.4-buster
+  commands:
+    - PACKAGE_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
+    - echo $PACKAGE_VERSION
+  when:
+    branch:
+      - master
+    event:
+      - push
+  depends_on:
+    - sonar_scan
+- name: dev-deploy-designer
+  pull: if-not-exists
+  image: node:12.18.4-buster
+  commands:
+    - echo "deploy designer"
+  depends_on:
+    - dev-build-image-designer
+- name: dev-deploy-runner
+  pull: if-not-exists
+  image: node:12.18.4-buster
+  commands:
+    - echo "deploy runner"
+  depends_on:
+    - dev-build-image-runner
+- name: dev-smoke-tests
+  pull: if-not-exists
+  image: node:12.18.4-buster
+  commands:
+    - echo  "Smoke tests"
+  depends_on:
+    - dev-deploy-designer
+    - dev-deploy-runner
 ---
 kind: pipeline
 name: build-deploy-runner
