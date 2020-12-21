@@ -36,6 +36,7 @@ steps:
     - echo $PACKAGE_VERSION
     - cd designer
     - yarn build
+    - docker build . -t digital-form-builder-designer:$
   when:
     branch:
       - master
@@ -51,6 +52,7 @@ steps:
     - echo $PACKAGE_VERSION
     - cd runner
     - yarn build
+    - docker build . -t digital-form-builder-runner:$
   when:
     branch:
       - master
