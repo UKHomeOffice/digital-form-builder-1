@@ -78,13 +78,13 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "$DESIGNER_TAG_VERSION,$DRONE_COMMIT_SHA,latest" > .tags
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-      - echo "docker push $DESIGNER_TAG_VERSION"
-      - docker tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/stp-form-builder-designer:$DESIGNER_TAG_VERSION
-      - docker tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-      - docker tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-      - docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
-      - docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-      - docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
+      - echo "docker tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/stp-form-builder-designer:$DESIGNER_TAG_VERSION" > push.sh
+      - echo "docker tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA" >> push.sh
+      - echo "docker tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest" >> push.sh
+      - cat push.sh
     when:
       branch:
         - master
