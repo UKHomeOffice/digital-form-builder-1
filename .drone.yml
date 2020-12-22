@@ -77,10 +77,9 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
       - sh build.sh
-      - echo "docker push digital-form-builder-designer:latest " >> push.sh
-      - echo "docker push digital-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
-      - echo "docker push digital-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
-      - cat push.sh
+      - echo "docker push stp/fco-form-builder-designer:latest " >> push.sh
+      - echo "docker push stp/fco-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
+      - echo "docker push stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
       - sh push.sh
     when:
       branch:
@@ -94,7 +93,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
   - name: deploy-designer
@@ -121,6 +120,22 @@ name: runner-deploy
 type: kubernetes
 
 steps:
+  - name: ecr-login
+      pull: if-not-exists
+      image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
+      environment:
+        AWS_ACCESS_KEY_ID:
+          from_secret: RUNNER_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY:
+          from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
+        AWS_REGION: eu-west-2
+      commands:
+        # wait for docker service to be up before running docker build
+        - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+        - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
+      volumes:
+        - name: dockerclientconfig
+          path: /root/.docker
   - name: build-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -129,9 +144,12 @@ steps:
       - n=0; while [ "$n" -lt 90 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-runner:$RUNNER_TAG_VERSION -t digital-form-builder-runner:$DRONE_COMMIT_SHA -t digital-form-builder-runner:latest ./images/runner/." > build.sh
-      - cat build.sh
+      - echo "docker build -t stp/fco-form-builder:$RUNNER_TAG_VERSION -t digital-form-builder-runner:$DRONE_COMMIT_SHA -t digital-form-builder-runner:latest ./images/runner/.  --no-cache" > build.sh
       - sh build.sh
+      - echo "docker push stp/fco-form-builder:latest " >> push.sh
+      - echo "docker push stp/fco-form-builder:$DRONE_COMMIT_SHA " >> push.sh
+      - echo "docker push stp/fco-form-builder:$DESIGNER_TAG_VERSION " >> push.sh
+      - sh push.sh
     when:
       branch:
         - master
@@ -141,7 +159,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: digital-form-builder-runner:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: stp/fco-form-builder:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
   - name: deploy-runner
