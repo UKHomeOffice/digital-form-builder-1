@@ -215,16 +215,7 @@ steps:
 #          - push
 #    depends_on:
 #      - build-runner-image
-services:
-  - name: docker
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  - name: anchore-submission-server
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    commands:
-      - /run.sh server
-depends_on:
-  - code-analyze-check
+
 depends_on:
   - code-analyze-check
 
@@ -233,10 +224,10 @@ services:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
   
   - name: anchore-submission-server
-      image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-      pull: always
-      commands:
-        - /run.sh server
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    commands:
+      - /run.sh server
 volumes:
   - name: dockerclientconfig
     temp: {}
