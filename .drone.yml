@@ -80,21 +80,22 @@ steps:
     commands:
       - "export DESIGNER_TAG_VERSION=$(node -e \"console.log(require('./designer/package.json').version);\")"
       - echo "$${DESIGNER_TAG_VERSION}"
+      - docker login 340268328991.dkr.ecr.eu-west-2.amazonaws.com
     depends_on:
       - build-designer-image
-  - name: publish-tag-to-ecr
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: AWS_SECRET_ACCESS_KEY
-          region: eu-west-2
-      repo: digital-form-builder-designer
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - ${DRONE_COMMIT_SHA}
-        - latest
+#  - name: publish-tag-to-ecr
+#    image: plugins/ecr
+#    settings:
+#      access_key:
+#        from_secret: AWS_ACCESS_KEY_ID
+#      secret_key:
+#        from_secret: AWS_SECRET_ACCESS_KEY
+#          region: eu-west-2
+#      repo: digital-form-builder-designer
+#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+#      tags:
+#        - ${DRONE_COMMIT_SHA}
+#        - latest
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
