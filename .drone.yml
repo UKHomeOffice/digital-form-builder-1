@@ -95,7 +95,6 @@ steps:
         tags:
           - ${DRONE_COMMIT_SHA}
           - latest
-          - ${DESIGNER_TAG_VERSION}
       when:
         branch:
           - master
