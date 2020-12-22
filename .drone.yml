@@ -78,11 +78,7 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
       - sh build.sh
-      - echo "docker push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:latest " >> push.sh
-      - echo "docker push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
-      - echo "docker push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
-      - cat push.sh
-      - sh push.sh
+      - docker image push -a 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer
     when:
       branch:
         - master
