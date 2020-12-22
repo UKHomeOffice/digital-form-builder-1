@@ -128,14 +128,14 @@ steps:
 #            - push
 #    depends_on:
 #      - build-designer-image
-services:
-  - name: docker
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  - name: anchore-submission-server
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    commands:
-      - /run.sh server
+#services:
+#  - name: docker
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+#  - name: anchore-submission-server
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+#    pull: always
+#    commands:
+#      - /run.sh server
 depends_on:
   - code-analyze-check
 
@@ -143,6 +143,11 @@ services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 
+- name: anchore-submission-server
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    commands:
+      - /run.sh server
 volumes:
   - name: dockerclientconfig
     temp: {}
@@ -220,11 +225,18 @@ services:
       - /run.sh server
 depends_on:
   - code-analyze-check
+depends_on:
+  - code-analyze-check
 
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-
+  
+  - name: anchore-submission-server
+      image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+      pull: always
+      commands:
+        - /run.sh server
 volumes:
   - name: dockerclientconfig
     temp: {}
@@ -239,6 +251,7 @@ steps:
     image: node:12.18.4-buster
     commands:
       - echo 'Smoke Tests'
+      -  cd smoke-test | yarn
     when:
       branch:
         - master
