@@ -88,9 +88,9 @@ steps:
         - master
       event:
         - push
-  volumes:
-    - name: dockerclientconfig
-      path: /root/.docker
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
   - name: scan-designer-image
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
