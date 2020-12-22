@@ -60,8 +60,13 @@ steps:
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/." > build.sh
-      - cat build.sh
       - sh build.sh
+      - echo "docker login" > push.sh
+      - echo "docker push digital-form-builder-designer:latest " >> push.sh
+      - echo "docker push digital-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
+      - echo "docker push digital-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
+      - cat push.sh
+      - sh push.sh
     when:
       branch:
         - master
@@ -74,28 +79,6 @@ steps:
       IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
-  - name: check publish config
-    pull: if-not-exists
-    image: node:12.18.4-buster
-    commands:
-      - "export DESIGNER_TAG_VERSION=$(node -e \"console.log(require('./designer/package.json').version);\")"
-      - echo "$${DESIGNER_TAG_VERSION}"
-      - docker login 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-    depends_on:
-      - build-designer-image
-#  - name: publish-tag-to-ecr
-#    image: plugins/ecr
-#    settings:
-#      access_key:
-#        from_secret: AWS_ACCESS_KEY_ID
-#      secret_key:
-#        from_secret: AWS_SECRET_ACCESS_KEY
-#          region: eu-west-2
-#      repo: digital-form-builder-designer
-#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-#      tags:
-#        - ${DRONE_COMMIT_SHA}
-#        - latest
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
