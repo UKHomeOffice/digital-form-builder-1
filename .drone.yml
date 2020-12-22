@@ -159,7 +159,7 @@ steps:
       - docker image ls
       - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
       - cat push-tag.sh
-      - sh push-tag.sh
+      #- sh push-tag.sh
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:$DRONE_COMMIT_SHA
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:latest
     when:
@@ -167,11 +167,11 @@ steps:
         - master
       event:
         - push
-#  - name: scan-runner-image
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-#    pull: always
-#    environment:
-#      IMAGE_NAME: digital-form-builder-runner:${DRONE_COMMIT_SHA}
+  - name: scan-runner-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:latest
 #    depends_on:
 #      - build-runner-image
 #  - name: deploy-runner
