@@ -90,7 +90,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: stp/form-builder-designer:$${DRONE_COMMIT_SHA}
+      IMAGE_NAME: stp/form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
   - name: publish-designer-image
@@ -169,7 +169,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: stp/form-builder-runner:$${DRONE_COMMIT_SHA}
+      IMAGE_NAME: stp/form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
   - name: publish-runner-image
