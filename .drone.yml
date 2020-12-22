@@ -101,8 +101,6 @@ steps:
           - master
         event:
           - push
-    depends_on:
-      - build-designer-image
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
