@@ -20,22 +20,6 @@ steps:
         - master
       event:
         - push
-  - name: build-img-1
-    image: docker:17.09.1
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - docker build -t ./images/designer/.
-    when:
-      event: push
-  - name: build-img-2
-    image: docker:17.09.1
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - docker build -t ./images/runner/.
-    when:
-      event: push
 #- name: dev-run-tests-with-coverage
 #  pull: if-not-exists
 #  image: node:12.18.4-buster
@@ -113,7 +97,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: stp/form-builder-designer:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: 40268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
 #  - name: deploy-designer
@@ -190,7 +174,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: stp/form-builder-runner:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
 #  - name: deploy-runner
