@@ -44,114 +44,6 @@ steps:
 #      - push
 #  depends_on:
 #    - dev-run-tests-with-coverage
-#- name: check-designer-version
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - export DESIGNER_TAG_VERSION=$(node -e "console.log(require('./designer/package.json').version);")
-#    - echo $DESIGNER_TAG_VERSION
-#- name: dev-build-image-designer
-#  pull: if-not-exists
-#  image: docker:lastest
-#  volumes:
-#    - name: docker_sock
-#      path: /var/run/docker.sock
-#  commands:
-#    - docker build .
-#    - echo "- echo "digital-form-builder-runner:$DESIGNER_TAG_VERSION"
-#    - docker -t digital-form-builder-designer:$DESIGNER_TAG_VERSION
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-#  depends_on:
-#    - check-designer-version
-#- name: check-runner-version
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - RUNNER_TAG_VERSION=$(node -e "console.log(require('./runner/package.json').version);")
-#    - echo $RUNNER_TAG_VERSION
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-#  depends_on:
-#    - sonar_scan
-#- name: publish-ecr
-#  pull: if-not-exists
-#  image: plugins/ecr
-#  settings:
-#    group: publish
-#    settings:
-#      access_key:
-#        from_secret: AWS_ACCESS_KEY_ID
-#      secret_key:
-#        from_secret: AWS_SECRET_ACCESS_KEY
-#      context: ./runner
-#      dockerfile: ./runner/Dockerfile
-#      region: eu-west-2
-#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-#      repo: digital-form-build/runner
-#      tags:
-#        - latest
-#        - ${DRONE_COMMIT_SHA:0:7}
-#        - ${RUNNER_TAG_VERSION}
-#  depends_on:
-#    - sonar_scan
-#- name: dev-build-image-runner
-#  pull: if-not-exists
-#  image: docker:latest
-#  commands:
-#    - docker build .
-#    - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-#  depends_on:
-#    - check-runner-version
-#- name: dev-deploy-designer
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - echo "deploy designer"
-#  depends_on:
-#    - dev-build-image-designer
-#- name: dev-deploy-runner
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - echo "deploy runner"
-#  depends_on:
-#    - dev-build-image-runner
-#- name: dev-smoke-tests
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - echo  "Smoke tests"
-#  depends_on:
-#    - dev-deploy-designer
-#    - dev-deploy-runner
-#kind: pipeline
-#type: docker
-#name: docker-tagging
-#
-#steps:
-#  - name: tag runner
-#  pull: if-not-exists
-#  commands:
-#    - docker build .
-#    - echo "digital-form-builder-runner:$RUNNER_TAG_VERSION"
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-
 
 ---
 kind: pipeline
@@ -182,28 +74,36 @@ steps:
       IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
-  - name: publish
-      image: plugins/ecr
-      settings:
-        access_key:
-          from_secret: AWS_ACCESS_KEY_ID
-        secret_key:
-          from_secret: AWS_SECRET_ACCESS_KEY
-        region: eu-west-2
-        create_repository: true
-        repo: digital-form-builder-designer
-        registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-        tags:
-          - latest
-          - ${DRONE_COMMIT_SHA}
-          - ${DESIGNER_TAG_VERSION}
-      when:
-        branch:
-          - master
-        event:
-          - push
-      depends_on:
-        - build-designer-image
+  - name: check publish config
+    pull: if-not-exists
+    image: node:12.18.4-buster
+    commands:
+      - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo "$${DESIGNER_TAG_VERSION}"
+    depends_on:
+      - build-designer-image
+#  - name: publish
+#      image: plugins/ecr
+#      settings:
+#        access_key:
+#          from_secret: AWS_ACCESS_KEY_ID
+#        secret_key:
+#          from_secret: AWS_SECRET_ACCESS_KEY
+#        region: eu-west-2
+#        create_repository: true
+#        repo: digital-form-builder-designer
+#        registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+#        tags:
+#          - latest
+#          - ${DRONE_COMMIT_SHA}
+#          - ${DESIGNER_TAG_VERSION}
+#      when:
+#        branch:
+#          - master
+#        event:
+#          - push
+#      depends_on:
+#        - build-designer-image
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -251,28 +151,28 @@ steps:
       IMAGE_NAME: digital-form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-  - name: publish
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: AWS_SECRET_ACCESS_KEY
-      region: eu-west-2
-      create_repository: true
-      repo: digital-form-builder-runner
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - latest
-        - ${DRONE_COMMIT_SHA}
-        - ${RUNNER_TAG_VERSION}
-    when:
-      branch:
-        - master
-      event:
-        - push
-    depends_on:
-      - build-runner-image
+#  - name: publish
+#    image: plugins/ecr
+#    settings:
+#      access_key:
+#        from_secret: AWS_ACCESS_KEY_ID
+#      secret_key:
+#        from_secret: AWS_SECRET_ACCESS_KEY
+#      region: eu-west-2
+#      create_repository: true
+#      repo: digital-form-builder-runner
+#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+#      tags:
+#        - latest
+#        - ${DRONE_COMMIT_SHA}
+#        - ${RUNNER_TAG_VERSION}
+#    when:
+#      branch:
+#        - master
+#      event:
+#        - push
+#    depends_on:
+#      - build-runner-image
   - name: deploy-runner
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
