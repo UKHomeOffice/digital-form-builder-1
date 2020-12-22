@@ -77,10 +77,10 @@ steps:
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-      - docker image ls
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
+#      - docker image ls
+#      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
+#      - cat push-tag.sh
+#      - sh push-tag.sh
     #      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DRONE_COMMIT_SHA}
     #      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:latest
     when:
@@ -91,13 +91,13 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-#  - name: scan-designer-image
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-#    pull: always
-#    environment:
-#      IMAGE_NAME: digital-form-builder-designer:${DRONE_COMMIT_SHA}
-#    depends_on:
-#      - build-designer-image
+  - name: scan-designer-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-designer-image
 #  - name: deploy-designer
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
@@ -156,9 +156,9 @@ steps:
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
       - docker build -t stp/form-builder-runner:$RUNNER_TAG_VERSION -t stp/form-builder-runner:$DRONE_COMMIT_SHA -t stp/form-builder-runner:latest ./images/runner/. --no-cache
-      - docker image ls
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
+#      - docker image ls
+#      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
+#      - cat push-tag.sh
       #- sh push-tag.sh
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:$DRONE_COMMIT_SHA
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:latest
@@ -171,7 +171,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:latest
+      IMAGE_NAME: stp/form-builder-runner:latest
 #    depends_on:
 #      - build-runner-image
 #  - name: deploy-runner
