@@ -70,8 +70,6 @@ steps:
   - name: build-designer-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    environment:
-      AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
       - sleep 5;
@@ -147,8 +145,6 @@ steps:
   - name: build-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    environment:
-      AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
       - sleep 5;
