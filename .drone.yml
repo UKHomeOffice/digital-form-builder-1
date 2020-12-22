@@ -84,7 +84,7 @@ steps:
       - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION" >> push.sh
       - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA" >> push.sh
       - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest" >> push.sh
-      - cat push.sh
+      - sh push.sh
     when:
       branch:
         - master
@@ -100,15 +100,6 @@ steps:
       IMAGE_NAME: stp/form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
-  - name: publish-designer-image
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    pull: always
-    commands:
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/stp-form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-    depends_on:
-      - scan-designer-image
 #  - name: deploy-designer
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
@@ -168,6 +159,13 @@ steps:
       - echo "$${RUNNER_TAG_VERSION}"
       - docker build -t stp/form-builder-runner:$RUNNER_TAG_VERSION -t stp/form-builder-runner:$DRONE_COMMIT_SHA -t stp/form-builder-runner:latest ./images/runner/. --no-cache
       - echo "docker push $RUNNER_TAG_VERSION"
+      - echo "docker tag stp/fco-form-builder:$RUNNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/stp-form-builder-designer:$DESIGNER_TAG_VERSION" > push.sh
+      - echo "docker tag stp/fco-form-builder:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA" >> push.sh
+      - echo "docker tag stp/fco-form-builder:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA" >> push.sh
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest" >> push.sh
+      - sh push.sh
     when:
       branch:
         - master
@@ -180,17 +178,6 @@ steps:
       IMAGE_NAME: stp/form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-  - name: publish-runner-image
-    pull: if-not-exists
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    commands:
-      # wait for docker service to be up before running docker build
-      - sleep 5;
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-    depends_on:
-      - scan-runner-image
 #  - name: deploy-runner
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
