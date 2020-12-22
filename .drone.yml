@@ -78,6 +78,9 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "$DESIGNER_TAG_VERSION,$DRONE_COMMIT_SHA,latest" > .tags
       - docker build -t stp/form-builder-designer:$DESIGNER_TAG_VERSION -t stp/form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
+      - cat push-tag.sh
+      - sh push-tag.sh
     when:
       branch:
         - master
