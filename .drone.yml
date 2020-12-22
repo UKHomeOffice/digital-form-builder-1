@@ -70,6 +70,8 @@ steps:
   - name: build-designer-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    environment:
+      AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
       - sleep 5;
@@ -77,12 +79,7 @@ steps:
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-      - docker image ls
-      - echo "docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-#      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DRONE_COMMIT_SHA}
-#      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:latest
+      - docker push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}
     when:
       branch:
         - master
@@ -149,6 +146,8 @@ steps:
   - name: build-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    environment:
+      AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
       - sleep 5;
@@ -156,12 +155,7 @@ steps:
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
       - docker build -t stp/form-builder-runner:$RUNNER_TAG_VERSION -t stp/form-builder-runner:$DRONE_COMMIT_SHA -t stp/form-builder-runner:latest ./images/runner/. --no-cache
-      - docker image ls
-      - echo "docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-      #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:$DRONE_COMMIT_SHA
-      #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:latest
+      - docker push "340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:${{RUNNER_TAG_VERSION}"
     when:
       branch:
         - master
