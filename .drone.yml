@@ -56,9 +56,9 @@ steps:
     image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
     environment:
       AWS_ACCESS_KEY_ID:
-        from_secret: ecr_aws_access_key_id
+        from_secret: DESIGNER_AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY:
-        from_secret: ecr_aws_secret_access_key
+        from_secret: DESIGNER_AWS_SECRET_ACCESS_KEY
       AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
@@ -75,9 +75,8 @@ steps:
       - n=0; while [ "$n" -lt 90 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
+      - echo "docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
       - sh build.sh
-      - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
       - echo "docker push digital-form-builder-designer:latest " >> push.sh
       - echo "docker push digital-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
       - echo "docker push digital-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
