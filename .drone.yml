@@ -93,21 +93,6 @@ steps:
       IMAGE_NAME: stp/form-builder-designer:$${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
-  - name: dev-build-image
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: AWS_SECRET_ACCESS_KEY
-      region: eu-west-2
-      repo: stp/form-builder-designer
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-    when:
-      branch:
-        - master
-      event:
-        - push
   - name: publish-designer-image
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     pull: always
@@ -115,8 +100,6 @@ steps:
       - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
       - cat push-tag.sh
       - sh push-tag.sh
-      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-designer:$${DRONE_COMMIT_SHA}
-      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-designer:latest
     depends_on:
       - scan-designer-image
 #  - name: deploy-designer
@@ -187,12 +170,17 @@ steps:
     pull: always
     environment:
       IMAGE_NAME: stp/form-builder-runner:$${DRONE_COMMIT_SHA}
+    depends_on:
+      - build-runner-image
   - name: publish-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       # wait for docker service to be up before running docker build
       - sleep 5;
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
+      - cat push-tag.sh
+      - sh push-tag.sh
     depends_on:
       - scan-runner-image
 #  - name: deploy-runner
