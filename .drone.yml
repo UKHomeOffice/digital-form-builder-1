@@ -152,9 +152,9 @@ steps:
     image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
     environment:
       AWS_ACCESS_KEY_ID:
-        from_secret: DESIGNER_AWS_ACCESS_KEY_ID
+        from_secret: RUNNER_AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY:
-        from_secret: DESIGNER_AWS_SECRET_ACCESS_KEY
+        from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
       AWS_REGION: eu-west-2
     commands:
       # wait for docker service to be up before running docker build
