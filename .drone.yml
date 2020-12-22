@@ -78,8 +78,9 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - docker build -t "stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}" -t "stp/fco-form-builder-designer:$${DRONE_COMMIT_SHA}" -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-      - docker push "340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}"
+      - echo "docker build -t stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION} -t stp/fco-form-builder-designer:$${DRONE_COMMIT_SHA} -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache" > docker-build.sh
+      - sh docker-build.sh
+      #- docker push "340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}"
     when:
       branch:
         - master
