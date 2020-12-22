@@ -75,12 +75,12 @@ steps:
       - n=0; while [ "$n" -lt 90 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
-      - sh build.sh
-      - echo "docker push stp/fco-form-builder-designer:latest " >> push.sh
-      - echo "docker push stp/fco-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
-      - echo "docker push stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
-      - sh push.sh
+#      - echo "docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
+#      - sh build.sh
+#      - echo "docker push stp/fco-form-builder-designer:latest " >> push.sh
+#      - echo "docker push stp/fco-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
+#      - echo "docker push stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
+#      - sh push.sh
     when:
       branch:
         - master
@@ -89,13 +89,13 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: scan-designer-image
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    environment:
-      IMAGE_NAME: "stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}"
-    depends_on:
-      - build-designer-image
+#  - name: scan-designer-image
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+#    pull: always
+#    environment:
+#      IMAGE_NAME: "stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}"
+#    depends_on:
+#      - build-designer-image
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -144,24 +144,24 @@ steps:
       - n=0; while [ "$n" -lt 90 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
-      - echo "docker build -t stp/fco-form-builder:$RUNNER_TAG_VERSION -t digital-form-builder-runner:$DRONE_COMMIT_SHA -t digital-form-builder-runner:latest ./images/runner/.  --no-cache" > build.sh
-      - sh build.sh
-      - echo "docker push stp/fco-form-builder:latest " >> push.sh
-      - echo "docker push stp/fco-form-builder:$DRONE_COMMIT_SHA " >> push.sh
-      - echo "docker push stp/fco-form-builder:$DESIGNER_TAG_VERSION " >> push.sh
-      - sh push.sh
+#      - echo "docker build -t stp/fco-form-builder:$RUNNER_TAG_VERSION -t digital-form-builder-runner:$DRONE_COMMIT_SHA -t digital-form-builder-runner:latest ./images/runner/.  --no-cache" > build.sh
+#      - sh build.sh
+#      - echo "docker push stp/fco-form-builder:latest " >> push.sh
+#      - echo "docker push stp/fco-form-builder:$DRONE_COMMIT_SHA " >> push.sh
+#      - echo "docker push stp/fco-form-builder:$DESIGNER_TAG_VERSION " >> push.sh
+#      - sh push.sh
     when:
       branch:
         - master
       event:
         - push
-  - name: scan-runner-image
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    environment:
-      IMAGE_NAME: "stp/fco-form-builder:${DRONE_COMMIT_SHA}"
-    depends_on:
-      - build-runner-image
+#  - name: scan-runner-image
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+#    pull: always
+#    environment:
+#      IMAGE_NAME: "stp/fco-form-builder:${DRONE_COMMIT_SHA}"
+#    depends_on:
+#      - build-runner-image
   - name: deploy-runner
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
