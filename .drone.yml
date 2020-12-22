@@ -47,7 +47,7 @@ steps:
 
 ---
 kind: pipeline
-name: designer-deploy
+name: designer-build-and-deploy
 type: kubernetes
 
 steps:
@@ -78,7 +78,9 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
       - docker image ls
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}
+      - echo "docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
+      - cat push-tag.sh
+      - sh push-tag.sh
 #      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:$${DRONE_COMMIT_SHA}
 #      - docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/fco-form-builder-designer:latest
     when:
@@ -140,7 +142,7 @@ volumes:
 
 ---
 kind: pipeline
-name: runner-deploy
+name: runner-build-and-deploy
 type: kubernetes
 
 steps:
@@ -155,7 +157,9 @@ steps:
       - echo "$${RUNNER_TAG_VERSION}"
       - docker build -t stp/form-builder-runner:$RUNNER_TAG_VERSION -t stp/form-builder-runner:$DRONE_COMMIT_SHA -t stp/form-builder-runner:latest ./images/runner/. --no-cache
       - docker image ls
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}"
+      - echo "docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
+      - cat push-tag.sh
+      - sh push-tag.sh
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:$DRONE_COMMIT_SHA
       #- docker image push 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com/stp/form-builder-runner:latest
     when:
@@ -229,6 +233,6 @@ steps:
       event:
         - push
 depends_on:
-  - designer-deploy
-  - runner-deploy
+  - designer-build-and-deploy
+  - runner-build-and-deploy
   - code-analyze-check
