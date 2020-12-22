@@ -82,7 +82,7 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
     depends_on:
       - build-designer-image
-  - name: publish
+  - name: publish-dev-tag
       image: plugins/ecr
       settings:
         access_key:
@@ -90,18 +90,17 @@ steps:
         secret_key:
           from_secret: AWS_SECRET_ACCESS_KEY
         region: eu-west-2
-        create_repository: true
-        repo: digital-form-builder-designer
+        repo: stp/fco-form-builder
         registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
         tags:
-          - latest
           - ${DRONE_COMMIT_SHA}
+          - latest
           - ${DESIGNER_TAG_VERSION}
-     when:
-      branch:
-        - master
-      event:
-        - push
+      when:
+        branch:
+          - master
+        event:
+          - push
     depends_on:
       - build-designer-image
   - name: deploy-designer
