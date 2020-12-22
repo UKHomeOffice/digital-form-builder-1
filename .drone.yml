@@ -77,7 +77,7 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "docker build -t digital-form-builder-designer:$DESIGNER_TAG_VERSION -t digital-form-builder-designer:$DRONE_COMMIT_SHA -t digital-form-builder-designer:latest ./images/designer/. --no-cache" > build.sh
       - sh build.sh
-      - - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
+      - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
       - echo "docker push digital-form-builder-designer:latest " >> push.sh
       - echo "docker push digital-form-builder-designer:$DRONE_COMMIT_SHA " >> push.sh
       - echo "docker push digital-form-builder-designer:$DESIGNER_TAG_VERSION " >> push.sh
