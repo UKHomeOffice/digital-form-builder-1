@@ -93,18 +93,9 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
-      IMAGE_NAME: stp/form-builder-designer:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: stp/form-builder-designer:latest
     depends_on:
       - build-designer-image
-  - name: publish-designer-image
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    pull: always
-    commands:
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-designer:$${DESIGNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-    depends_on:
-      - scan-designer-image
 #  - name: deploy-designer
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
@@ -128,14 +119,6 @@ steps:
 #            - push
 #    depends_on:
 #      - build-designer-image
-#services:
-#  - name: docker
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-#  - name: anchore-submission-server
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-#    pull: always
-#    commands:
-#      - /run.sh server
 depends_on:
   - code-analyze-check
 
@@ -168,6 +151,9 @@ steps:
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
       - docker build -t stp/form-builder-runner:$RUNNER_TAG_VERSION -t stp/form-builder-runner:$DRONE_COMMIT_SHA -t stp/form-builder-runner:latest ./images/runner/. --no-cache
+      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
+      - cat push-tag.sh
+      - sh push-tag.sh
     when:
       branch:
         - master
@@ -180,17 +166,6 @@ steps:
       IMAGE_NAME: stp/form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-  - name: publish-runner-image
-    pull: if-not-exists
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    commands:
-      # wait for docker service to be up before running docker build
-      - sleep 5;
-      - echo "docker push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner:$${RUNNER_TAG_VERSION}" > push-tag.sh
-      - cat push-tag.sh
-      - sh push-tag.sh
-    depends_on:
-      - scan-runner-image
 #  - name: deploy-runner
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
