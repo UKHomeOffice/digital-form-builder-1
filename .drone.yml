@@ -83,18 +83,18 @@ steps:
     depends_on:
       - build-designer-image
   - name: publish-tag-to-ecr
-      image: plugins/ecr
-      settings:
-        access_key:
-          from_secret: AWS_ACCESS_KEY_ID
-        secret_key:
-          from_secret: AWS_SECRET_ACCESS_KEY
-            region: eu-west-2
-        repo: stp/fco-form-builder
-        registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-#        tags:
-#          - ${DRONE_COMMIT_SHA}
-#          - latest
+    image: plugins/ecr
+    settings:
+      access_key:
+        from_secret: AWS_ACCESS_KEY_ID
+      secret_key:
+        from_secret: AWS_SECRET_ACCESS_KEY
+          region: eu-west-2
+      repo: digital-form-builder-designer
+      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+      tags:
+        - ${DRONE_COMMIT_SHA}
+        - latest
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -142,28 +142,6 @@ steps:
       IMAGE_NAME: digital-form-builder-runner:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-#  - name: publish
-#    image: plugins/ecr
-#    settings:
-#      access_key:
-#        from_secret: AWS_ACCESS_KEY_ID
-#      secret_key:
-#        from_secret: AWS_SECRET_ACCESS_KEY
-#      region: eu-west-2
-#      create_repository: true
-#      repo: digital-form-builder-runner
-#      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-#      tags:
-#        - latest
-#        - ${DRONE_COMMIT_SHA}
-#        - ${RUNNER_TAG_VERSION}
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
-#    depends_on:
-#      - build-runner-image
   - name: deploy-runner
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
