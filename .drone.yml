@@ -85,21 +85,16 @@ steps:
   - name: publish-dev-tag
       image: plugins/ecr
       settings:
-        access_key:
-          from_secret: AWS_ACCESS_KEY_ID
-        secret_key:
-          from_secret: AWS_SECRET_ACCESS_KEY
+#        access_key:
+#          from_secret: AWS_ACCESS_KEY_ID
+#        secret_key:
+#          from_secret: AWS_SECRET_ACCESS_KEY
         region: eu-west-2
         repo: stp/fco-form-builder
         registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
         tags:
           - ${DRONE_COMMIT_SHA}
           - latest
-      when:
-        branch:
-          - master
-        event:
-          - push
   - name: deploy-designer
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
