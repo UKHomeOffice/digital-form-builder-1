@@ -78,8 +78,11 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "$DESIGNER_TAG_VERSION,$DRONE_COMMIT_SHA,latest" > .tags
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
+      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
       - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
 #      - echo "docker tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/stp-form-builder-designer:$DESIGNER_TAG_VERSION" > push.sh
 #      - echo "docker tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA" >> push.sh
@@ -96,13 +99,13 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-#  - name: scan-designer-image
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-#    pull: always
-#    environment:
-#      IMAGE_NAME: 40268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
-#    depends_on:
-#      - build-designer-image
+  - name: scan-designer-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    environment:
+      IMAGE_NAME: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
+    depends_on:
+      - build-designer-image
 #  - name: deploy-designer
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
