@@ -67,17 +67,15 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: prep-env
-    pull: if-not-exists
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    commands:
-      #- sleep 5;
-      # wait for docker service to be up before running docker build
-      #- n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-      - echo $TAG_VERSION > .tags
-    depends_on:
-      - ecr-login
+#  - name: prep-env
+#    pull: if-not-exists
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+#    commands:
+#      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+#      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+#      - echo $TAG_VERSION > .tags
+#    depends_on:
+#      - ecr-login
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -186,17 +184,17 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: prep-env
-    pull: if-not-exists
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    commands:
-      #- sleep 5;
-      # wait for docker service to be up before running docker build
-      #- n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-      - echo $TAG_VERSION > .tags
-    depends_on:
-      - ecr-login
+#  - name: prep-env
+#    pull: if-not-exists
+#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+#    commands:
+#      #- sleep 5;
+#      # wait for docker service to be up before running docker build
+#      #- n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+#      - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+#      - echo $TAG_VERSION > .tags
+#    depends_on:
+#      - ecr-login
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
