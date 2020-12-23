@@ -67,25 +67,23 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
+  - name: prep-env
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      #- sleep 5;
+      # wait for docker service to be up before running docker build
+      #- n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo $TAG_VERSION > .tags
+    depends_on:
+      - ecr-login
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      # wait for docker service to be up before running docker build
-      - sleep 5;
-      - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-      - echo "$${DESIGNER_TAG_VERSION}"
-      - export DRONE_SEMVER=$${RUNNER_TAG_VERSION}
-      - echo "$DESIGNER_TAG_VERSION" > .tags
-      - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-#      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-#      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
-#      - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-#      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+      - echo "$TAG_VERSION" > .tags
+      - docker build -t stp/fco-form-builder-designer:$TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
     when:
       branch:
         - master
@@ -106,18 +104,15 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      # wait for docker service to be up before running docker build
-      - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "Drone commit sha tag- $${DRONE_COMMIT_SHA}"
-      - echo "Symver $${DRONE_SEMVER}"
-      - echo $(cat .tags)
+      - export TAG_VERSION=${echo cat .tags}
+      - echo "$${TAG_VERSION}"
       - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image tag stp/fco-form-builder-designer:$TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$TAG_VERSION
       - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$TAG_VERSION
       - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}\t{{.Created}}\t{{.Size}}"
     when:
       branch:
         - master
@@ -137,7 +132,7 @@ steps:
       - bin/deploy.sh
     environment:
       DRONE_DEPLOY_TO: acp-notprod
-      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
+      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${TAG_VERSION}
       KUBE_NAMESPACE: stp-dev
       KUBE_TOKEN_ACP_NOTPROD:
         from_secret: kube_token_acp_notprod
@@ -191,17 +186,25 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
+  - name: prep-env
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      #- sleep 5;
+      # wait for docker service to be up before running docker build
+      #- n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo $TAG_VERSION > .tags
+    depends_on:
+      - ecr-login
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      # wait for docker service to be up before running docker build
-      - sleep 5;
-      - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-      - echo "$${RUNNER_TAG_VERSION}"
-      - export DRONE_SEMVER=$${RUNNER_TAG_VERSION}
-      - docker build -t stp/fco-form-builder:$RUNNER_TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
+      - env
+      - export TAG_VERSION=${cat .tags}
+      - echo "$${TAG_VERSION}"
+      - docker build -t stp/fco-form-builder:$TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
     when:
       branch:
         - master
@@ -219,15 +222,15 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - echo "Runner tag- $${RUNNER_TAG_VERSION}"
-      - echo "Drone commit sha tag- $${DRONE_COMMIT_SHA}"
-      - echo "Symver $${DRONE_SEMVER}"
+      - export TAG_VERSION=${cat .tags}
+      - echo "Runner tag- $${TAG_VERSION}"
       - docker image tag stp/fco-form-builder:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
-      - docker image tag stp/fco-form-builder:$RUNNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
+      - docker image tag stp/fco-form-builder:$TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$TAG_VERSION
       - docker image tag stp/fco-form-builder:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$TAG_VERSION
       - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
       - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
+      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}\t{{.Created}}\t{{.Size}}"
     when:
       branch:
         - master
