@@ -51,6 +51,7 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
+      - ls -lah .tags
       - "export TAG_VERSION=$(cat .tags)"
       - echo " TAG - $TAG_VERSION"
       - docker build -t stp/fco-form-builder-designer:$TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
@@ -170,6 +171,7 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
+      - ls -lah .tags
       - "export TAG_VERSION=$(cat .tags)"
       - echo " TAG - $TAG_VERSION"
       - docker build -t stp/fco-form-builder:$TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
