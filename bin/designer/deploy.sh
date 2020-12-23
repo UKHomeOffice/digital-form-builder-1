@@ -14,12 +14,12 @@ echo "--- tag           : ${DRONE_TAG=notset}"
 echo "--- image version : ${IMAGE_VERSION=notset}"
 
 if ! kd --timeout=5m \
-  -f kube/deployment.yaml \
-  -f kube/service.yaml \
-  -f kube/networkpolicy-internal.yaml \
-  -f kube/networkpolicy-external.yaml \
-  -f kube/ingress-internal.yaml \
-  -f kube/ingress-external.yaml \
+  -f kube/designer/deployment.yaml \
+  -f kube/designer/service.yaml \
+  -f kube/designer/networkpolicy-internal.yaml \
+  -f kube/designer/networkpolicy-external.yaml \
+  -f kube/designer/ingress-internal.yaml \
+  -f kube/designer/ingress-external.yaml \
   ; then
   echo "[error] failed to deploy ${NAME}"
   exit 1
