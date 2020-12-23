@@ -28,11 +28,12 @@ jobs:
       with:
         ref: master
     - run: |
+        echo "-------------"
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git reset --hard
-        git fetch
-        git rebase origin/master
-        echo "-------------"
+        git config pull.rebase true
+        echo "------config done-------"
+        git pull
+        echo "-----pull latest from XGovFormBuilder--------"
         git pull https://github.com/XGovFormBuilder/digital-form-builder
         
