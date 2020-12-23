@@ -63,6 +63,8 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
+    depends_on:
+      - setup
   - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
