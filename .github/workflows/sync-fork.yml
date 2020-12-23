@@ -30,6 +30,7 @@ jobs:
     - run: | 
         git config user.name github-actions
         git config user.email github-actions@github.com
+        git reset --hard
         git pull
-        git pull --rebase https://github.com/XGovFormBuilder/digital-form-builder
-        git push -u -f
+        git pull https://github.com/XGovFormBuilder/digital-form-builder
+        
