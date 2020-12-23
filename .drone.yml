@@ -45,8 +45,8 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-      - echo "$${DESIGNER_TAG_VERSION}" > .tags
+      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo "$${TAG_VERSION}" > .tags
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
