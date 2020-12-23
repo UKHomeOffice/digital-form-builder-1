@@ -103,8 +103,8 @@ steps:
     commands:
       - apk update
       - apk add curl
-      - source bin/env.sh
-      - bin/deploy.sh
+      - source bin/designer/env.sh
+      - bin/designer/deploy.sh
     environment:
       DRONE_DEPLOY_TO: acp-notprod
       IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
@@ -226,8 +226,8 @@ steps:
     commands:
       - apk update
       - apk add curl
-      - source bin/env.sh
-      - bin/deploy.sh
+      - source bin/runner/env.sh
+      - bin/runner/deploy.sh
     environment:
       DRONE_DEPLOY_TO: acp-notprod
       IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner
