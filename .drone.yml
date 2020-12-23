@@ -1,5 +1,5 @@
 kind: pipeline
-name: code-analyze-check
+name: pull_versions
 type: kubernetes
 
 trigger:
@@ -7,11 +7,12 @@ trigger:
   event:
     - push
 steps:
-  - name: build
+  - name: check-external-versions
     pull: if-not-exists
     image: node:12.18.4-buster
     commands:
-      - node -v
+      - curl https://github.com/XGovFormBuilder/digital-form-builder/tree/master/designer/package.json -o designer.json
+      - export DEIGNER_VERSION=$(node -e "console.log(require('./designer.json').version);")
     when:
       branch:
         - master
@@ -123,7 +124,7 @@ steps:
       - publish
 
 depends_on:
-  - code-analyze-check
+  - check-external-versions
 
 services:
   - name: docker
@@ -246,7 +247,7 @@ steps:
     depends_on:
       - publish
 depends_on:
-  - code-analyze-check
+  - check-external-versions
 
 services:
   - name: docker
@@ -279,7 +280,7 @@ steps:
 depends_on:
   - designer-build-and-deploy
   - runner-build-and-deploy
-  - code-analyze-check
+  - check-external-versions
 
 ---
 kind: pipeline
@@ -303,6 +304,8 @@ steps:
       - name: dockerclientconfig
         path: /root/.docker
     when:
+      branch:
+        - master
       event:
         - tag
   - name: test-build-designer-image
@@ -318,6 +321,8 @@ steps:
       tags:
         - ${DRONE_TAG}
     when:
+      branch:
+        - master
       event:
         - tag
   - name: test-build-runner-image
@@ -333,6 +338,8 @@ steps:
       tags:
         - ${DRONE_TAG}
     when:
+      branch:
+        - master
       event:
         - tag
 services:
