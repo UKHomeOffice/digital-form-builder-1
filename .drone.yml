@@ -47,7 +47,6 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${TAG_VERSION}" > .tags
-      - ls -lah *
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
@@ -55,7 +54,6 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - ls -lah *
       - "export TAG_VERSION=$(cat .tags)"
       - echo " TAG - $TAG_VERSION"
       - docker build -t stp/fco-form-builder-designer:$TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
@@ -169,7 +167,6 @@ steps:
     commands:
       - sleep 5;
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - ls -lah .
       - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${TAG_VERSION}" > .tags
     volumes:
@@ -179,7 +176,6 @@ steps:
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - ls -lah .tags
       - "export TAG_VERSION=$(cat .tags)"
       - echo " TAG - $TAG_VERSION"
       - docker build -t stp/fco-form-builder:$TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
