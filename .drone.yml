@@ -12,38 +12,11 @@ steps:
     image: node:12.18.4-buster
     commands:
       - node -v
-    #    - yarn
-    #    - yarn build:dependencies
-    #    - yarn test-cov
     when:
       branch:
         - master
       event:
         - push
-#- name: dev-run-tests-with-coverage
-#  pull: if-not-exists
-#  image: node:12.18.4-buster
-#  commands:
-#    - yarn
-#    - yarn build:dependencies
-#    - yarn test-cov
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-#- name: sonar_scan
-#  pull: if-not-exists
-#  image: quay.digital.homeoffice.gov.uk/ukhomeofficedigital/sonar-scanner-node:6a03c77c7e1bad005893cdcc9cd3d99479b79d5c
-#  commands:
-#    - sonar-scanner -Dsonar.projectVersion=${DRONE_BUILD_NUMBER} -Dsonar.projectBaseDir=. -Dsonar.projectKey=digital-form-builder
-#  when:
-#    branch:
-#      - master
-#    event:
-#      - push
-#  depends_on:
-#    - dev-run-tests-with-coverage
 
 ---
 kind: pipeline
