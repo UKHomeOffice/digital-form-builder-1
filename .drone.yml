@@ -125,25 +125,25 @@ steps:
       - scan-designer-image
   - name: deploy-designer
     image: quay.io/ukhomeofficedigital/kd:v1.16.0
-      commands:
-        - apk update
-        - apk add curl
-        - source bin/env.sh
-        - bin/deploy.sh
-        environment:
-          DRONE_DEPLOY_TO: acp-notprod
-          IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
-          KUBE_NAMESPACE: stp-dev
-          KUBE_TOKEN_ACP_NOTPROD:
-            from_secret: kube_token_acp_notprod
-          PREVIEW_MODE: true
-          PREVIEW_URL: https://form-builder.dev.stp-notprod.homeoffice.gov.uk
-          PUBLISH_URL: https://form-builder.dev.internal.stp-notprod.homeoffice.gov.uk
-        when:
-          branch:
-            - master
-          event:
-            - push
+    commands:
+      - apk update
+      - apk add curl
+      - source bin/env.sh
+      - bin/deploy.sh
+      environment:
+        DRONE_DEPLOY_TO: acp-notprod
+        IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
+        KUBE_NAMESPACE: stp-dev
+        KUBE_TOKEN_ACP_NOTPROD:
+          from_secret: kube_token_acp_notprod
+        PREVIEW_MODE: true
+        PREVIEW_URL: https://form-builder.dev.stp-notprod.homeoffice.gov.uk
+        PUBLISH_URL: https://form-builder.dev.internal.stp-notprod.homeoffice.gov.uk
+      when:
+        branch:
+          - master
+        event:
+          - push
     depends_on:
       - publish-designer-image
 
@@ -228,26 +228,26 @@ steps:
       - scan-runner-image
   - name: deploy-runner
     image: quay.io/ukhomeofficedigital/kd:v1.16.0
-      commands:
-        - apk update
-        - apk add curl
-        - source bin/env.sh
-        - bin/deploy.sh
-      environment:
-        DRONE_DEPLOY_TO: acp-notprod
-        IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner
-        KUBE_NAMESPACE: stp-dev
-        KUBE_TOKEN_ACP_NOTPROD:
-          from_secret: kube_token_acp_notprod
-        PREVIEW_MODE: true
-        GOV_UK_NOTIFY_DEFAULT_API_KEY:
-          from_secret: NOTIFY_API_KEY
-        GOV_UK_NOTIFY_DEFAULT_TEMPLATE_ID: 2d2a640b-db7f-4eb8-8b41-e5d75fc64b64
-      when:
-        branch:
-          - master
-        event:
-          - push
+    commands:
+      - apk update
+      - apk add curl
+      - source bin/env.sh
+      - bin/deploy.sh
+    environment:
+      DRONE_DEPLOY_TO: acp-notprod
+      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/form-builder-runner
+      KUBE_NAMESPACE: stp-dev
+      KUBE_TOKEN_ACP_NOTPROD:
+        from_secret: kube_token_acp_notprod
+      PREVIEW_MODE: true
+      GOV_UK_NOTIFY_DEFAULT_API_KEY:
+        from_secret: NOTIFY_API_KEY
+      GOV_UK_NOTIFY_DEFAULT_TEMPLATE_ID: 2d2a640b-db7f-4eb8-8b41-e5d75fc64b64
+    when:
+      branch:
+        - master
+      event:
+        - push
     depends_on:
       - publish-runner-image
 depends_on:
