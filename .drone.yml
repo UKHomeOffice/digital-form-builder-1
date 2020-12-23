@@ -47,6 +47,9 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${TAG_VERSION}" > .tags
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -165,8 +168,12 @@ steps:
     commands:
       - sleep 5;
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - ls -lah .
       - "export TAG_VERSION=$(cat ./builder/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${TAG_VERSION}" > .tags
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
   - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -180,6 +187,9 @@ steps:
         - master
       event:
         - push
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
   - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
@@ -206,6 +216,9 @@ steps:
         - master
       event:
         - push
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
     depends_on:
       - scan
   - name: deploy
