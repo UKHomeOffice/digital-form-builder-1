@@ -299,60 +299,18 @@ depends_on:
 ---
 kind: pipeline
 name: deploy-to-test
+type: kubernetes
 trigger:
   branch: master
   event:
     - tag
 steps:
-  - name: ecr-login
+  - name: deploy to test
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: RUNNER_AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
-      AWS_REGION: eu-west-2
+    image: node:12.18.4-buster
     commands:
-      # wait for docker service to be up before running docker build
-      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
-    volumes:
-      - name: dockerclientconfig
-        path: /root/.docker
-  - name: test-build-designer-image
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: AWS_SECRET_ACCESS_KEY
-      region: eu-west-2
-      repo: stp/fco-form-builder-designer
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - ${DRONE_TAG}
-  - name: test-build-runner-image
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: RUNNER_AWS_ACCESS_KEY_ID
-      secret_key:
-        from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
-      region: eu-west-2
-      repo: stp/fco-form-builder
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - ${DRONE_TAG}
-services:
-  - name: docker
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  
-  - name: anchore-submission-server
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    commands:
-      - /run.sh server
+      - echo 'Smoke Tests'
+
 volumes:
   - name: dockerclientconfig
     temp: {}
