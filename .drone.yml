@@ -67,7 +67,7 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: build-designer-image
+  - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -76,7 +76,8 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export DESIGNER_TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "$DESIGNER_TAG_VERSION,$DRONE_COMMIT_SHA,latest" > .tags
+      - export DRONE_SEMVER=$${RUNNER_TAG_VERSION}
+      - echo "$DESIGNER_TAG_VERSION" > .tags
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
 #      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
 #      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
@@ -93,20 +94,23 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: scan-designer-image
+  - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
       IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
       WHITELIST: CVE-2020-7788,CVE-2020-7754,CVE-2020-7774,CVE-2017-18589,CVE-2020-15133,CVE-2020-7788,CVE-2020-7774
     depends_on:
-      - build-designer-image
-  - name: publish-designer-image
+      - build
+  - name: publish
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       # wait for docker service to be up before running docker build
       - echo "$${DESIGNER_TAG_VERSION}"
+      - echo "Drone commit sha tag- $${$DRONE_COMMIT_SHA}"
+      - echo "Symver $${DRONE_SEMVER}"
+      - echo $(cat .tags)
       - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
       - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
@@ -123,8 +127,8 @@ steps:
       - name: dockerclientconfig
         path: /root/.docker
     depends_on:
-      - scan-designer-image
-  - name: deploy-designer
+      - scan
+  - name: deploy
     image: quay.io/ukhomeofficedigital/kd:v1.16.0
     commands:
       - apk update
@@ -146,7 +150,7 @@ steps:
       event:
         - push
     depends_on:
-      - publish-designer-image
+      - publish
 
 depends_on:
   - code-analyze-check
@@ -187,7 +191,7 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-  - name: build-runner-image
+  - name: build
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
@@ -196,25 +200,28 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export RUNNER_TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${RUNNER_TAG_VERSION}"
+      - export DRONE_SEMVER=$${RUNNER_TAG_VERSION}
       - docker build -t stp/fco-form-builder:$RUNNER_TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
     when:
       branch:
         - master
       event:
         - push
-  - name: scan-runner-image
+  - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
       IMAGE_NAME: stp/fco-form-builder:${DRONE_COMMIT_SHA}
       WHITELIST: CVE-2020-7788,CVE-2020-7754,CVE-2020-7774,CVE-2017-18589,CVE-2020-15133,CVE-2020-7788,CVE-2020-7774
     depends_on:
-      - build-runner-image
-  - name: publish-runner-image
+      - build
+  - name: publish
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      - echo "$${RUNNER_TAG_VERSION}"
+      - echo "Runner tag- $${RUNNER_TAG_VERSION}"
+      - echo "Drone commit sha tag- $${$DRONE_COMMIT_SHA}"
+      - echo "Symver $${DRONE_SEMVER}"
       - docker image tag stp/fco-form-builder:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder:$RUNNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
       - docker image tag stp/fco-form-builder:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
@@ -227,8 +234,8 @@ steps:
       event:
         - push
     depends_on:
-      - scan-runner-image
-  - name: deploy-runner
+      - scan
+  - name: deploy
     image: quay.io/ukhomeofficedigital/kd:v1.16.0
     commands:
       - apk update
@@ -251,7 +258,7 @@ steps:
       event:
         - push
     depends_on:
-      - publish-runner-image
+      - publish
 depends_on:
   - code-analyze-check
 
