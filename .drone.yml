@@ -130,20 +130,20 @@ steps:
       - apk add curl
       - source bin/env.sh
       - bin/deploy.sh
-      environment:
-        DRONE_DEPLOY_TO: acp-notprod
-        IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
-        KUBE_NAMESPACE: stp-dev
-        KUBE_TOKEN_ACP_NOTPROD:
-          from_secret: kube_token_acp_notprod
-        PREVIEW_MODE: true
-        PREVIEW_URL: https://form-builder.dev.stp-notprod.homeoffice.gov.uk
-        PUBLISH_URL: https://form-builder.dev.internal.stp-notprod.homeoffice.gov.uk
-      when:
-        branch:
-          - master
-        event:
-          - push
+    environment:
+      DRONE_DEPLOY_TO: acp-notprod
+      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${RUNNER_TAG_VERSION}
+      KUBE_NAMESPACE: stp-dev
+      KUBE_TOKEN_ACP_NOTPROD:
+        from_secret: kube_token_acp_notprod
+      PREVIEW_MODE: true
+      PREVIEW_URL: https://form-builder.dev.stp-notprod.homeoffice.gov.uk
+      PUBLISH_URL: https://form-builder.dev.internal.stp-notprod.homeoffice.gov.uk
+    when:
+      branch:
+        - master
+      event:
+        - push
     depends_on:
       - publish-designer-image
 
@@ -208,7 +208,7 @@ steps:
       IMAGE_NAME: stp/fco-form-builder:${DRONE_COMMIT_SHA}
     depends_on:
       - build-runner-image
-  - name: build-runner-image
+  - name: publish-runner-image
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
