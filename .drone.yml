@@ -169,6 +169,7 @@ steps:
       - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
       - echo "$${TAG_VERSION}" > .tags
+      - cat .tags
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
