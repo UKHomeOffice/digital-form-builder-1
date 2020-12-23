@@ -31,6 +31,8 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git reset --hard
-        git pull
+        git fetch
+        git rebase origin/master
+        echo "-------------"
         git pull https://github.com/XGovFormBuilder/digital-form-builder
         
