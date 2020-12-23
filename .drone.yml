@@ -1,5 +1,5 @@
 kind: pipeline
-name: pull_versions
+name: code-analyze-check
 type: kubernetes
 
 trigger:
@@ -7,12 +7,11 @@ trigger:
   event:
     - push
 steps:
-  - name: check-external-versions
+  - name: build
     pull: if-not-exists
     image: node:12.18.4-buster
     commands:
-      - curl https://github.com/XGovFormBuilder/digital-form-builder/tree/master/designer/package.json -o designer.json
-      - export DEIGNER_VERSION=$(node -e "console.log(require('./designer.json').version);")
+      - node -v
     when:
       branch:
         - master
@@ -23,11 +22,6 @@ steps:
 kind: pipeline
 name: designer-build-and-deploy
 type: kubernetes
-
-trigger:
-  branch: master
-  event:
-    - push
 
 steps:
   - name: ecr-login
@@ -129,7 +123,7 @@ steps:
       - publish
 
 depends_on:
-  - check-external-versions
+  - code-analyze-check
 
 services:
   - name: docker
@@ -150,10 +144,6 @@ kind: pipeline
 name: runner-build-and-deploy
 type: kubernetes
 
-trigger:
-  branch: master
-  event:
-    - push
 steps:
   - name: ecr-login
     pull: if-not-exists
@@ -256,7 +246,7 @@ steps:
     depends_on:
       - publish
 depends_on:
-  - check-external-versions
+  - code-analyze-check
 
 services:
   - name: docker
@@ -274,10 +264,6 @@ volumes:
 kind: pipeline
 name: sanity-check-dev
 type: kubernetes
-trigger:
-  branch: master
-  event:
-    - push
 
 steps:
   - name: smoke-tests
@@ -293,7 +279,7 @@ steps:
 depends_on:
   - designer-build-and-deploy
   - runner-build-and-deploy
-  - check-external-versions
+  - code-analyze-check
 
 ---
 kind: pipeline
@@ -352,3 +338,15 @@ steps:
     when:
       event:
         - tag
+services:
+  - name: docker
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  
+  - name: anchore-submission-server
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+    pull: always
+    commands:
+      - /run.sh server
+volumes:
+  - name: dockerclientconfig
+    temp: {}
