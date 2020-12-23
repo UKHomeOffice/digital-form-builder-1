@@ -95,8 +95,6 @@ steps:
     environment:
       IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
       WHITELIST: CVE-2020-7788,CVE-2020-7754,CVE-2020-7774,CVE-2017-18589,CVE-2020-15133,CVE-2020-7788,CVE-2020-7774
-    depends_on:
-      - build
   - name: publish
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
