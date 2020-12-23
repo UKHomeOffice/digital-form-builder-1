@@ -12,6 +12,7 @@ steps:
     image: node:12.18.4-buster
     commands:
       - node -v
+      - curl https://github.com/XGovFormBuilder/digital-form-builder/tree/master/designer/package.json -o designer.json
     when:
       branch:
         - master
