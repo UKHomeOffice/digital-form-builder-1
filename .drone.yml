@@ -108,7 +108,7 @@ steps:
     commands:
       # wait for docker service to be up before running docker build
       - echo "$${DESIGNER_TAG_VERSION}"
-      - echo "Drone commit sha tag- $${$DRONE_COMMIT_SHA}"
+      - echo "Drone commit sha tag- $${DRONE_COMMIT_SHA}"
       - echo "Symver $${DRONE_SEMVER}"
       - echo $(cat .tags)
       - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
@@ -220,7 +220,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       - echo "Runner tag- $${RUNNER_TAG_VERSION}"
-      - echo "Drone commit sha tag- $${$DRONE_COMMIT_SHA}"
+      - echo "Drone commit sha tag- $${DRONE_COMMIT_SHA}"
       - echo "Symver $${DRONE_SEMVER}"
       - docker image tag stp/fco-form-builder:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder:$RUNNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
