@@ -291,18 +291,6 @@ steps:
         - master
       event:
         - push
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook: https://hooks.slack.com/services/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
-      channel: stp-dev-alerts
-      link_names: true
-      template: >
-        {{#success build.status}}
-          build {{build.number}} succeeded. Good job. <@Gautam.Pachnanda>
-        {{else}}
-          build {{build.number}} failed. Fix me please. <@channelname> <@someone>
-        {{/success}}
 depends_on:
   - designer-build-and-deploy
   - runner-build-and-deploy
