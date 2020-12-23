@@ -75,7 +75,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
       - echo "$${DESIGNER_TAG_VERSION}"
-      - export TAG_VERSION=$(cat .tags)
+      - "export TAG_VERSION=$(echo cat .tags)"
       - echo "TAG - $${TAG_VERSION}"
       - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
