@@ -28,7 +28,10 @@ steps:
 kind: pipeline
 name: designer-build-and-deploy
 type: kubernetes
-
+trigger:
+  branch: master
+  event:
+    - push
 steps:
   - name: ecr-login
     pull: if-not-exists
@@ -149,7 +152,10 @@ volumes:
 kind: pipeline
 name: runner-build-and-deploy
 type: kubernetes
-
+trigger:
+  branch: master
+  event:
+    - push
 steps:
   - name: ecr-login
     pull: if-not-exists
@@ -270,7 +276,10 @@ volumes:
 kind: pipeline
 name: sanity-check-dev
 type: kubernetes
-
+trigger:
+  branch: master
+  event:
+    - push
 steps:
   - name: smoke-tests
     pull: if-not-exists
