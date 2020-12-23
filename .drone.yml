@@ -320,9 +320,6 @@ steps:
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-    when:
-      event:
-        - tag
   - name: test-build-designer-image
     image: plugins/ecr
     settings:
@@ -335,9 +332,6 @@ steps:
       registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
       tags:
         - ${DRONE_TAG}
-    when:
-      event:
-        - tag
   - name: test-build-runner-image
     image: plugins/ecr
     settings:
@@ -350,9 +344,6 @@ steps:
       registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
       tags:
         - ${DRONE_TAG}
-    when:
-      event:
-        - tag
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
