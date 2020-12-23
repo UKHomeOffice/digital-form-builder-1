@@ -61,43 +61,42 @@ steps:
         from_secret: DESIGNER_AWS_SECRET_ACCESS_KEY
       AWS_REGION: eu-west-2
     commands:
-      # wait for docker service to be up before running docker build
       - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
       - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
     volumes:
       - name: dockerclientconfig
         path: /root/.docker
-#  - name: prep-env
-#    pull: if-not-exists
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-#    commands:
-#      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-#      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-#      - echo $TAG_VERSION > .tags
-#    depends_on:
-#      - ecr-login
-#  - name: build
-#    pull: if-not-exists
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-#    commands:
-#      - echo "$${TAG_VERSION}" > .tags
-#      - docker build -t stp/fco-form-builder-designer:$TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
-#    volumes:
-#      - name: dockerclientconfig
-#        path: /root/.docker
+  - name: prep-env
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - "export TAG_VERSION=$(cat ./designer/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo $TAG_VERSION > .tags
+    depends_on:
+      - ecr-login
+  - name: build
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      - echo "$${TAG_VERSION}" > .tags
+      - docker build -t stp/fco-form-builder-designer:$TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
+    when:
+      branch:
+        - master
+      event:
+        - push
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
   - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
       IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
       WHITELIST: CVE-2020-7788,CVE-2020-7754,CVE-2020-7774,CVE-2017-18589,CVE-2020-15133,CVE-2020-7788,CVE-2020-7774
-#    depends_on:
-#      - build
+    depends_on:
+      - build
   - name: publish
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
@@ -130,7 +129,7 @@ steps:
       - bin/deploy.sh
     environment:
       DRONE_DEPLOY_TO: acp-notprod
-      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer$${TAG_VERSION}
+      IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer
       KUBE_NAMESPACE: stp-dev
       KUBE_TOKEN_ACP_NOTPROD:
         from_secret: kube_token_acp_notprod
@@ -145,77 +144,74 @@ steps:
     depends_on:
       - publish
 
-depends_on:
-  - code-analyze-check
+  depends_on:
+    - code-analyze-check
 
-services:
-  - name: docker
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  
-  - name: anchore-submission-server
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
-    pull: always
-    commands:
-      - /run.sh server
+  services:
+    - name: docker
+      image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 
-volumes:
-  - name: dockerclientconfig
-    temp: {}
+    - name: anchore-submission-server
+      image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+      pull: always
+      commands:
+        - /run.sh server
 
----
-kind: pipeline
-name: runner-build-and-deploy
-type: kubernetes
+  volumes:
+    - name: dockerclientconfig
+      temp: {}
 
-steps:
-  - name: ecr-login
+  ---
+  kind: pipeline
+  name: runner-build-and-deploy
+  type: kubernetes
+
+  steps:
+    - name: ecr-login
+      pull: if-not-exists
+      image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
+      environment:
+        AWS_ACCESS_KEY_ID:
+          from_secret: RUNNER_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY:
+          from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
+        AWS_REGION: eu-west-2
+      commands:
+        - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+        - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
+      volumes:
+        - name: dockerclientconfig
+          path: /root/.docker
+  - name: prep-env
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/dind-awscli:19.03.12-dind-1.18.55
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: RUNNER_AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: RUNNER_AWS_SECRET_ACCESS_KEY
-      AWS_REGION: eu-west-2
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
     commands:
-      # wait for docker service to be up before running docker build
-      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-      - aws ecr get-login-password --region $${AWS_REGION} | docker login --username AWS --password-stdin 340268328991.dkr.ecr.$${AWS_REGION}.amazonaws.com
-    volumes:
-      - name: dockerclientconfig
-        path: /root/.docker
-#  - name: prep-env
-#    pull: if-not-exists
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-#    commands:
-#      #- sleep 5;
-#      # wait for docker service to be up before running docker build
-#      #- n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
-#      - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
-#      - echo $TAG_VERSION > .tags
-#    depends_on:
-#      - ecr-login
-#  - name: build
-#    pull: if-not-exists
-#    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-#    commands:
-#      - env
-#      - export TAG_VERSION=${cat .tags}
-#      - echo "$${TAG_VERSION}"
-#      - docker build -t stp/fco-form-builder:$TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
+      - n=0; while [ "$n" -lt 120 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - "export TAG_VERSION=$(cat ./runner/package.json | grep version | head -1 | cut -d : -f2 | cut -d , -f1 | tr -d '\"' | tr -d ' ')"
+      - echo $TAG_VERSION > .tags
+    depends_on:
+      - ecr-login
+  - name: build
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      - env
+      - export TAG_VERSION=${cat .tags}
+      - echo "$${TAG_VERSION}"
+      - docker build -t stp/fco-form-builder:$TAG_VERSION -t stp/fco-form-builder:$DRONE_COMMIT_SHA -t stp/fco-form-builder:latest ./images/runner/. --no-cache
+    when:
+      branch:
+        - master
+      event:
+        - push
   - name: scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
     environment:
       IMAGE_NAME: stp/fco-form-builder:${DRONE_COMMIT_SHA}
       WHITELIST: CVE-2020-7788,CVE-2020-7754,CVE-2020-7774,CVE-2017-18589,CVE-2020-15133,CVE-2020-7788,CVE-2020-7774,CVE-2020-7769
-#    depends_on:
-#      - build
+    depends_on:
+      - build
   - name: publish
     pull: if-not-exists
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
