@@ -78,13 +78,13 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "$DESIGNER_TAG_VERSION,$DRONE_COMMIT_SHA,latest" > .tags
       - docker build -t stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION -t stp/fco-form-builder-designer:$DRONE_COMMIT_SHA -t stp/fco-form-builder-designer:latest ./images/designer/. --no-cache
-      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
-      - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
-      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+#      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
+#      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+#      - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
+#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
+#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
+#      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
     when:
       branch:
         - master
@@ -100,6 +100,29 @@ steps:
       IMAGE_NAME: stp/fco-form-builder-designer:${DRONE_COMMIT_SHA}
     depends_on:
       - build-designer-image
+  - name: publish-designer-image
+    pull: if-not-exists
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      # wait for docker service to be up before running docker build
+      - echo "$${DESIGNER_TAG_VERSION}"
+      - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
+      - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
+      - docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+    when:
+      branch:
+        - master
+      event:
+        - push
+    volumes:
+      - name: dockerclientconfig
+        path: /root/.docker
+    depends_on:
+      - scan-designer-image
 #  - name: deploy-designer
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
@@ -130,7 +153,7 @@ depends_on:
 services:
   - name: docker
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    
+  
   - name: anchore-submission-server
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
     pull: always
@@ -176,9 +199,9 @@ steps:
       - docker image tag stp/fco-form-builder:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder:$RUNNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
       - docker image tag stp/fco-form-builder:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
-#      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
+      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
     when:
       branch:
         - master
@@ -189,24 +212,8 @@ steps:
     pull: always
     environment:
       IMAGE_NAME: stp/fco-form-builder:${DRONE_COMMIT_SHA}
-      WHITELIST:
     depends_on:
       - build-runner-image
-  - name: publish-to-ecr
-    pull: if-not-exists
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-    commands:
-      - echo "$${RUNNER_TAG_VERSION}"
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$RUNNER_TAG_VERSION
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:$DRONE_COMMIT_SHA
-      - docker image push 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder:latest
-    depends_on:
-      - scan-runner-image
-    when:
-      branch:
-        - master
-      event:
-        - push
 #  - name: deploy-runner
 #    image: quay.io/ukhomeofficedigital/kd:v1.16.0
 #      commands:
