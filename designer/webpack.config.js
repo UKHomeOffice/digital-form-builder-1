@@ -1,9 +1,10 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const nodeExternals = require("webpack-node-externals");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const babelOptions = require("./.babelrc.js");
 const CopyPlugin = require("copy-webpack-plugin");
+const nodeExternals = require("webpack-node-externals");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
 const devMode = process.env.NODE_ENV !== "production";
 const prodMode = process.env.NODE_ENV === "production";
@@ -25,16 +26,13 @@ const client = {
   node: {
     __dirname: false,
   },
-  devtool: "source-map",
+  devtool: "eval-cheap-module-source-map",
   module: {
     rules: [
       {
         test: /\.(js|jsx|tsx|ts)$/,
         exclude: /node_modules/,
         loader: "babel-loader",
-        options: {
-          ...babelOptions,
-        },
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -71,7 +69,10 @@ const client = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "server", "views", "layout.html"),
       filename: "views/layout.html",
-      minify: false,
+      minify: prodMode,
+      scriptLoading: "defer",
+      inject: "head",
+      hash: prodMode,
     }),
     new MiniCssExtractPlugin({
       filename: devMode
@@ -86,6 +87,11 @@ const client = {
         { from: "client/i18n/translations", to: "assets/translations" },
         { from: "server/views", to: "views" },
       ],
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      defaultSizes: "gzip",
+      openAnalyzer: false,
     }),
   ],
   externals: {
@@ -116,9 +122,6 @@ const server = {
         test: /\.(js|jsx|tsx|ts)$/,
         exclude: /node_modules/,
         loader: "babel-loader",
-        options: {
-          ...babelOptions,
-        },
       },
     ],
   },
