@@ -75,7 +75,8 @@ steps:
       - echo "$${DESIGNER_TAG_VERSION}"
       - echo "Drone commit sha tag- $${DRONE_COMMIT_SHA}"
       - echo "Symver $${DRONE_SEMVER}"
-      - echo $(cat .tags)
+      - export TAG_VERSION=$(cat .tags)
+      - echo "$${TAG_VERSION}"
       - docker image tag stp/fco-form-builder-designer:$DRONE_COMMIT_SHA 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DRONE_COMMIT_SHA
       - docker image tag stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:$DESIGNER_TAG_VERSION
       - docker image tag stp/fco-form-builder-designer:latest 340268328991.dkr.ecr.eu-west-2.amazonaws.com/stp/fco-form-builder-designer:latest
