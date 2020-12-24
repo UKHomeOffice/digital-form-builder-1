@@ -309,7 +309,7 @@ steps:
     pull: if-not-exists
     image: node:12.18.4-buster
     commands:
-      - echo 'Smoke Tests'
+      - echo 'Triggered by tag'
     trigger:
       event:
         - tag
