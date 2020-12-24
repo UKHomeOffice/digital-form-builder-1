@@ -310,6 +310,9 @@ steps:
     image: node:12.18.4-buster
     commands:
       - echo 'Smoke Tests'
+    trigger:
+      event:
+        - tag
 
 volumes:
   - name: dockerclientconfig
