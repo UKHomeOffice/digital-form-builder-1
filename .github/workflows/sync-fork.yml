@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '*/5 * * * *'
@@ -30,12 +28,14 @@ jobs:
       with:
         ref: master
     - run: |
-        echo "-------------"
+        echo "Setup git config"
         git config user.name github-actions
         git config user.email github-actions@github.com
         git config pull.rebase true
-        echo "------config done-------"
+        echo "Config done"
+        git fetch --all
         git pull
-        echo "-----pull latest from XGovFormBuilder--------"
+        echo "Pull latest from XGovFormBuilder"
         git pull https://github.com/XGovFormBuilder/digital-form-builder
-        
+        git push -u -f
+        echo "Sync completed"
