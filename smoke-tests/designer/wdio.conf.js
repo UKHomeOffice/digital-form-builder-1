@@ -1,5 +1,4 @@
-const { ReportAggregator, HtmlReporter } = require("@rpii/wdio-html-reporter");
-
+const { hooks } = require("./support/hooks");
 const drivers = {
   chrome: { version: "86.0.4240.22" }, // https://chromedriver.chromium.org/
   firefox: { version: "0.27.0" }, // https://github.com/mozilla/geckodriver/releases
@@ -54,34 +53,6 @@ exports.config = {
         language: "en",
       },
     ],
-    [
-      HtmlReporter,
-      {
-        debug: true,
-        outputDir: "./reports/html-reports/",
-        filename: "report.html",
-        reportTitle: "Smoke Test Reports",
-
-        //to show the report in a browser when done
-        showInBrowser: true,
-
-        //to turn on screenshots after every test
-        useOnAfterCommandForScreenshot: false,
-
-        // to use the template override option, can point to your own file in the test project:
-        // templateFilename: path.resolve(__dirname, '../template/wdio-html-reporter-alt-template.hbs'),
-
-        // to add custom template functions for your custom template:
-        // templateFuncs: {
-        //     addOne: (v) => {
-        //         return v+1;
-        //     },
-        // },
-
-        //to initialize the logger
-        //LOG: log4j.getLogger("default"),
-      },
-    ],
   ],
   cucumberOpts: {
     require: ["./features/steps/*steps.js"],
@@ -98,32 +69,5 @@ exports.config = {
     timeout: 60000,
     ignoreUndefinedDefinitions: true,
   },
-
-  // =====
-  // Hooks
-  // =====
-
-  beforeFeature: function () {
-    browser.maximizeWindow();
-  },
-  onPrepare: function (config, capabilities) {
-    let reportAggregator = new ReportAggregator({
-      outputDir: "./reports/html-reports/",
-      filename: "master-report.html",
-      reportTitle: "Master Report",
-      browserName: capabilities.browserName,
-      collapseTests: true,
-      // to use the template override option, can point to your own file in the test project:
-      // templateFilename: path.resolve(__dirname, '../template/wdio-html-reporter-alt-template.hbs')
-    });
-    reportAggregator.clean();
-
-    global.reportAggregator = reportAggregator;
-  },
-
-  onComplete: function (exitCode, config, capabilities, results) {
-    (async () => {
-      await global.reportAggregator.createReport();
-    })();
-  },
+  ...hooks,
 };

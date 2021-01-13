@@ -24,7 +24,7 @@ const { config } = require("./wdio.conf.js");
   [
     "cucumberjs-json",
     {
-      jsonFolder: "./reports/ci/",
+      jsonFolder: "./reports/json/",
       language: "en",
     },
   ],
