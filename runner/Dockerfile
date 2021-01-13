@@ -18,11 +18,7 @@ RUN addgroup -g 1001 appuser && \
     chown -R appuser:appuser /usr/src/app && \
     chmod -R +x  /usr/src/app
 # copy build from previous stage
-COPY --from=build --chown=appuser:appuser /usr/src/app/package.json ./
-COPY --from=build --chown=appuser:appuser /usr/src/app/.yarn ./.yarn
-COPY --from=build --chown=appuser:appuser /usr/src/app/node_modules ./node_modules
-COPY --from=build --chown=appuser:appuser /usr/src/app/runner ./runner
-COPY --from=build --chown=appuser:appuser /usr/src/app/model ./model
+COPY --from=build --chown=appuser:appuser /usr/src/app/package.json /usr/src/app/.yarn /usr/src/app/node_modules /usr/src/app/runner /usr/src/app/model ./
 
 USER 1001
 
