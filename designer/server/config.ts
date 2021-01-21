@@ -20,6 +20,7 @@ const schema = joi.object({
     .string()
     .valid("trace", "info", "debug", "error")
     .default("debug"),
+  phase: joi.string().valid("alpha", "beta").optional(),
 });
 
 // Build config
@@ -32,7 +33,8 @@ const config = {
   persistentKeyId: process.env.PERSISTENT_KEY_ID,
   persistentAccessKey: process.env.PERSISTENT_ACCESS_KEY,
   s3Bucket: process.env.S3_BUCKET,
-  logLevel: process.env.LOG_LEVEL || "debug",
+  logLevel: process.env.LOG_LEVEL || "error",
+  phase: process.env.PHASE || "alpha",
 };
 
 // Validate config

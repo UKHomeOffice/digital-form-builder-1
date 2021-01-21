@@ -1,10 +1,12 @@
+# This file only contains base configuration needed for CI build and test
+# For local development environment please see docker-compose.dev.yml
 version: "3.9"
 services:
   designer:
     container_name: designer
     build:
       context: .
-      dockerfile: designer/Dockerfile
+      dockerfile: ./designer/Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -22,7 +24,7 @@ services:
     container_name: runner
     build:
       context: .
-      dockerfile: runner/Dockerfile
+      dockerfile: ./runner/Dockerfile
     ports:
       - "3009:3009"
     environment:
