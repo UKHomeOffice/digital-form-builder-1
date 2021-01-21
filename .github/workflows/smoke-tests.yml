@@ -49,6 +49,6 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: ${{ success() || failure() }}
         with:
-          name: smoke-tests
+          name: smoke-tests.tar
           path: smoke-tests.tar
           retention-days: 14
