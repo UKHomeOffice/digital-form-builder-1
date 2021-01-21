@@ -33,7 +33,7 @@ jobs:
       - name: Docker compose up
         run: docker-compose up -d
       - name: Install smoke tests dependencies
-        run: yarn install --ignore-optional --cwd "smoke-tests/designer"
+        run: yarn install --immutable --immutable-cache --cwd "smoke-tests/designer"
       - name: Check containers are running
         run: |
           docker ps
