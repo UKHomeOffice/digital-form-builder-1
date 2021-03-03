@@ -14,10 +14,10 @@ jobs:
       - uses: nuuday/github-changelog-action@v1.0.0
         with:
           next_version: "1.0.0"
-      - name: Read CHANGELOG
+      - name: Read CHANGELOG.md
         id: package
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./CHANGELOG.md
+          path: CHANGELOG.md
       - name: Echo CHANGELOG.md
         run: echo ${{ steps.package.outputs.content }}
