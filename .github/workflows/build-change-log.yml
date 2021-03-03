@@ -17,11 +17,9 @@ jobs:
         uses: saadmk11/changelog-ci@v0.7.0
         with:
           changelog_filename: CHANGELOG.md
-          config_file: changelog-ci-config.json
         # Add this if you are using it on a private repository
         # Or if you have turned on commenting through the config file.
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         id: Changelog
-      - name: Echo CHANGELOG.md
-        run: echo ${{ steps.package.outputs.content }}
+
